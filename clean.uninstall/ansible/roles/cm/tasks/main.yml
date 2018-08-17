@@ -1,0 +1,19 @@
+---
+- name: stop cloudera-scm-server
+  systemd:
+    name: {{ svc_cm_server }}
+    state: stopped
+
+- name: uninstall cloudera-manager-server
+  yum: 
+    name: {{ pkg_cm_server }}
+    state: absent
+
+- name: file instantiation
+  template: src=default.conf dest=/tmp/default.conf
+  notify:
+  - echo uptime
+
+- name: notify - echo uptime
+  notify:
+  - echo uptime

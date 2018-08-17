@@ -1,0 +1,7 @@
+---
+cdh_version: 5.14.0
+svc_cm_server: cloudera-scm-server
+svc_cm_agent: cloudera-scm-agent
+pkg_cm_server: cloudera-manager-server
+pkg_cm_agent: cloudera-manager-*
+
