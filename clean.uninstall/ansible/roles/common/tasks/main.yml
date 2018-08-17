@@ -1,3 +1,21 @@
+# in cm web
+#
+# 1. Record User Data Paths
+# 2. Stop all Services
+# 3. Deactivate and Remove Parcels
+# 4. Delete the Cluster
+# 5. Uninstall the Cloudera Manager Server
+# 6. Uninstall Cloudera Manager Agent and Managed Software
+# 7. Remove Cloudera Manager and User Data
+#     a. Kill Cloudera Manager and Managed Processes
+#     b. Remove Cloudera Manager Data
+#     c. Remove the Cloudera Manager Lock File
+#     d. Remove User Data
+#     e. Stop and Remove External Databases
+
+# do 1-4 on cm web 
+# followings are 5~7
+
 ---
 - name: stop cloudera-scm-agent
   systemd:
@@ -12,8 +30,7 @@
 - name: yum clean
   command: yum clean all
 
-# do 1-4 on cm web 
-# followings are 5~7
+# stop services and yum remove packages
 - name: more clean
   command: {{ item }}
   with_items:
@@ -26,6 +43,20 @@
     - yum remove 'cloudera-manager-*' -y
     - yum clean all  
 
+# Kill Cloudera Manager and Managed Processes 
+# On all Agent hosts, kill any running Cloudera Manager and managed processes:
+- name: shell example
+  shell: |
+    for user in cloudera-scm flume hadoop hdfs hbase hive httpfs hue impala llama mapred oozie solr spark sqoop sqoop2 yarn zookeeper; do 
+      id -u $user && ps -u $user -o pid= && kill -9 $(ps -u $user -o pid=)
+    done
+    exit 0
+  args:
+    executable: /bin/bash
+
+- name: more clean
+  command: {{ item }}
+  with_items:
     # Remove Cloudera Manager Data
     - umount cm_processes
     - rm -Rf /usr/share/cmf /var/lib/cloudera* /var/cache/yum/cloudera* /var/log/cloudera* /var/run/cloudera*
