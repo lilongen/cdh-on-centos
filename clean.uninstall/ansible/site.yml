@@ -1,6 +1,6 @@
 ---
-- name: clean uninstall CDH
-  hosts: all
+- name: clean uninstall cdh.cm.server
+  hosts: cm
   remote_user: root
   # remote_user: user
   # become: yes
@@ -8,4 +8,13 @@
 
   roles:
     - cm
+
+- name: clean uninstall cdh.cm.agent
+  hosts: node
+  remote_user: root
+  # remote_user: user
+  # become: yes
+  # become_method: sudo
+
+  roles:
     - common

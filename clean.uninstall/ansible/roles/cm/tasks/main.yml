@@ -9,6 +9,16 @@
     name: {{ pkg_cm_server }}
     state: absent
 
+- name: shell example
+  shell: |
+    echo $(uptime)
+    echo $(uptime)
+    echo $(uptime)
+
+    exit 0
+  args:
+    executable: /bin/bash
+
 - name: file instantiation
   template: src=default.conf dest=/tmp/default.conf
   notify:
