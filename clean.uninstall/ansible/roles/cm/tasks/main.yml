@@ -1,12 +1,13 @@
 ---
 - name: stop cloudera-scm-server
+  ignore_errors: yes
   systemd:
-    name: {{ svc_cm_server }}
+    name: "{{ svc_cm_server }}"
     state: stopped
 
 - name: uninstall cloudera-manager-server
   yum: 
-    name: {{ pkg_cm_server }}
+    name: "{{ pkg_cm_server }}"
     state: absent
 
 - name: shell example
@@ -25,5 +26,6 @@
   - echo uptime
 
 - name: notify - echo uptime
+  command: uptime
   notify:
   - echo uptime

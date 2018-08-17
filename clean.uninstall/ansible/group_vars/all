@@ -5,3 +5,5 @@ svc_cm_agent: cloudera-scm-agent
 pkg_cm_server: cloudera-manager-server
 pkg_cm_agent: cloudera-manager-*
 
+
+
