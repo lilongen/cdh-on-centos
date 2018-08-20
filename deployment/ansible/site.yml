@@ -26,14 +26,3 @@
   tags: t1
   roles:
     - cm
-
-- name: clean uninstall cdh.cm.agent
-  hosts: node
-  remote_user: root
-  tags: t2
-  # remote_user: user
-  # become: yes
-  # become_method: sudo
-
-  roles:
-    - common

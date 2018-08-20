@@ -1,63 +1,30 @@
 ---
-- name: stop cloudera-scm-agent
-  ignore_errors: yes
-  systemd:
-    name: "{{ svc_cm_agent }}"
-    state: stopped
+- name: install cloudera manager packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+    vars:
+      packages:
+        - "{{ pkg_cm_daemons }}"
+        - "{{ pkg_cm_server }}"
+        - psmisc
 
-- name: uninstall cloudera-manager-server
-  yum: 
-    name: "{{ pkg_cm_agent }}"
-    state: absent
+- name: copy file, db init script
+  copy:
+    src: file/init.sql
+    dest: /tmp/init.sql
 
-- name: yum clean
-  command: yum clean all
-
-# stop services and yum remove packages
-- name: more clean
-  ignore_errors: yes
-  command: "{{ item }}"
-  with_items:
-    # on cloudera manager server host
-    - systemctl stop cloudera-scm-server
-    - yum remove cloudera-manager-server -y
-
-    # on all cloudera manager agent hosts
-    - systemctl stop cloudera-scm-agent
-    - yum remove 'cloudera-manager-*' -y
-    - yum clean all  
-
-# Kill Cloudera Manager and Managed Processes 
-# On all Agent hosts, kill any running Cloudera Manager and managed processes:
-- name: shell example
-  shell: |
-    for user in cloudera-scm flume hadoop hdfs hbase hive httpfs hue impala llama mapred oozie solr spark sqoop sqoop2 yarn zookeeper; do 
-      id -u $user && ps -u $user -o pid= && kill -9 $(ps -u $user -o pid=)
-    done
-    exit 0
+- name: init cdh required databases environments
+  shell: mysql -h{{ mysql_host }} -u{{ mysql_user }} -p{{ mysql_password }} < /tmp/init.sql
   args:
     executable: /bin/bash
 
-- name: more clean
-  ignore_errors: yes
-  command: "{{ item }}"
-  with_items:
-    # Remove Cloudera Manager Data
-    - umount cm_processes
-    - rm -Rf /usr/share/cmf /var/lib/cloudera* /var/cache/yum/cloudera* /var/log/cloudera* /var/run/cloudera*
-
-    # Remove the Cloudera Manager Lock File
-    # On all Agent hosts, run this command to remove the Cloudera Manager lock file:
-    - rm /tmp/.scm_prepare_node.lock
-
-    # Remove User Data
-    # This step permanently removes all user data. To preserve the data, copy it to another cluster using the distcp command before starting the uninstall process. On all Agent hosts, run the following commands:
-    - rm -Rf /var/lib/flume-ng /var/lib/hadoop* /var/lib/hue /var/lib/navigator /var/lib/oozie /var/lib/solr /var/lib/sqoop* /var/lib/zookeeper
-
-    # Run the following command on each data drive on all Agent hosts (adjust the paths for the data drives on each host):
-    - rm -Rf data_drive_path/dfs data_drive_path/mapred data_drive_path/yarn
-
-- name: notify - echo uptime
-  command: uptime
+- name: execute /usr/share/cmf/schema/scm_prepare_database.sh
+  command: usr/share/cmf/schema/scm_prepare_database.sh -h{{ mysql_host }} -u{{ mysql_user }} -p{{ mysql_password }} --scm-host {{ cm_host }} mysql cmf cmf Uydc.cmf
   notify:
-  - echo uptime
+    - echo uptime
+
+- name: enable and start cloudera manager
+  systemd:
+    name: "{{ svc_cm_server }}" 
+    state: started
