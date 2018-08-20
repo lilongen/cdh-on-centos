@@ -1,0 +1,39 @@
+---
+# in cm web
+#
+# 1. Record User Data Paths
+# 2. Stop all Services
+# 3. Deactivate and Remove Parcels
+# 4. Delete the Cluster
+# 5. Uninstall the Cloudera Manager Server
+# 6. Uninstall Cloudera Manager Agent and Managed Software
+# 7. Remove Cloudera Manager and User Data
+#     a. Kill Cloudera Manager and Managed Processes
+#     b. Remove Cloudera Manager Data
+#     c. Remove the Cloudera Manager Lock File
+#     d. Remove User Data
+#     e. Stop and Remove External Databases
+# do 1-4 on cm web 
+# followings are 5~7
+#
+
+- name: clean uninstall cdh.cm.server
+  hosts: cm
+  remote_user: root
+  # remote_user: user
+  # become: yes
+  # become_method: sudo
+  tags: t1
+  roles:
+    - cm
+
+- name: clean uninstall cdh.cm.agent
+  hosts: node
+  remote_user: root
+  tags: t2
+  # remote_user: user
+  # become: yes
+  # become_method: sudo
+
+  roles:
+    - common
