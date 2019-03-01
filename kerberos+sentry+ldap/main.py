@@ -9,19 +9,32 @@ import subprocess
 import sys
 import os
 from jinja2 import Template
+import logging
+from logging.config import dictConfig
 
+logger: object
 conf: dict
 l: int
 
-tpl_vars = {
-    'pwd': os.path.dirname(sys.argv[0])
+yml_vars = {
+    'cwd': os.path.dirname(sys.argv[0])
 }
 
+def init_logger():
+    global logger
+    logging_config: dict
+    with open('{cwd}/conf/logging.yml'.format(**yml_vars), 'r') as f:
+        logging_config = YAML().load(f)
+        print(logging_config)
+    dictConfig(logging_config)
+    logger = logging.getLogger()
+
 def get_conf():
-    global conf, l, tpl_vars
-    with open('{}/security.cdh.yml'.format(tpl_vars['pwd']), 'r') as f:
+    global conf, l
+    with open('{cwd}/security.cdh.yml'.format(**yml_vars), 'r') as f:
         template = Template(f.read())
-        conf = YAML().load(template.render(**tpl_vars))
+        print(template.render(**yml_vars))
+        conf = YAML().load(template.render(**yml_vars))
 
 
 def bind_ldap():
@@ -37,7 +50,6 @@ def unbind_ldap():
 
 
 def get_ldap_users():
-    global conf, l
     ldap_conf = conf['ldap']
     re_1st_ou = re.compile(r'CN=[^,]+,OU=([^,]+),')
     search_res = l.search(ldap_conf['base_dn'], ldap.SCOPE_SUBTREE, ldap_conf['filter'], ldap_conf['attrs'])
@@ -59,7 +71,6 @@ def get_ldap_users():
 
 
 def generate_group_user_directory_playbook():
-    global conf, l
     playbook = []
     #generate new part
     for r_name, r in conf['role'].items():
@@ -132,37 +143,42 @@ def get_presence_and_yaml_diff():
 
 
 def generate_keytab():
-    global conf, l
-    cmd_tpl = 'kadmin -p {admin} -w {admin_pw} ktadd -k {keytab_to}/{username}.keytab'
+    addprinc_tpl = 'kadmin -p {admin} -w {admin_pw} addprinc -pw lle {username}'
+    ktadd_tpl = 'kadmin -p {admin} -w {admin_pw} ktadd -k {keytab_to}/{username}.keytab {username}'
     cmds = ''
     vars = conf['kerberos']
     for r_name, r in conf['role'].items():
         for u in r['user']:
             vars['username'] = u
-            cmds += cmd_tpl.format(**vars) + '\n'
+            cmds += addprinc_tpl.format(**vars) + '\n'
+            cmds += ktadd_tpl.format(**vars) + '\n'
 
-    # persist to file
-    sh_file = '{}/generate.keytab.sh'.format(conf['kerberos']['keytab_to'])
-    with open(sh_file, 'w') as f:
-        YAML().dump(cmds, f)
-    subprocess.run(['bash', sh_file])
+    sh = '{}/add.princ.with.keytab.sh'.format(conf['kerberos']['keytab_to'])
+    with open(sh, 'w') as f:
+        f.write(cmds)
+    ret = subprocess.check_output('bash {}'.format(sh), shell=True)
+    print(ret.decode())
+
 
 def get_node_user_group():
-    global conf, l
-    host = conf['cluster']['sample_host']
-    result = subprocess.run(['ssh', 'root@{}'.format(host), "grep g_ /etc/group | awk -F: '{print $1}'"], stdout=subprocess.PIPE)
-    groups = result.stdout.decode().split('\n')[0:-1]
+    result = subprocess.check_output("grep g_ /etc/group | awk -F: '{print $1}'", shell=True)
+    print(result)
+    groups = result.decode().split('\n')[0:-1]
     group_users = {}
     for g in groups:
         group_users[g] = {}
-        result = subprocess.run(['ssh', 'root@{}'.format(host), 'lid -n -g {}'.format(g)], stdout=subprocess.PIPE)
-        users = result.stdout.decode().split('\n')[0:-1]
+        result = subprocess.check_output('lid -n -g {}'.format(g), shell=True)
+        users = result.decode().split('\n')[0:-1]
         group_users[g]['user'] = list(map(lambda x: re.sub('^\s+', '', x), users))
     
     conf['presence_role'] = group_users
 
 
 def main():
+    init_logger()
+    logger.debug('hello')
+    logger.info('info hello')
+    return
     get_conf()
     bind_ldap()
     get_ldap_users()

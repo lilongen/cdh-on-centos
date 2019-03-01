@@ -1,0 +1,39 @@
+version: 1
+formatters:
+  brief:
+    format: '%(levelname)-8s: %(name)-15s: %(message)s'
+  precise:
+    format: '%(asctime)s %(name)-15s %(levelname)-8s %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: brief
+    level: INFO
+    stream: ext://sys.stdout
+  file:
+    class: logging.handlers.RotatingFileHandler
+    formatter: precise
+    filename: log/slk.log
+    mode: a
+  debugFile:
+    class: logging.FileHandler
+    formatter: precise
+    filename: log/slk-detail.log
+    mode: a
+
+loggers:
+  console:
+    level : INFO
+    handlers: [console]
+  file:
+    level: INFO
+    handlers: [console, file]
+    propagate: no
+  debugFile:
+    level: DEBUG
+    handlers: [console, debugFile]
+
+root:
+  level: DEBUG
+  handlers: [console, file, debugFile]

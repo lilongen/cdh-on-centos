@@ -16,11 +16,11 @@ role:
   g_prod:
     user: [prt, pol]
     workspace: /wsprod
-  
+
+ansible:
+  role_main_yml_to: {{ cwd }}/ansible/roles/common/tasks
+
 kerberos:
   admin: %admin
   admin_pw: %admin_pw
   keytab_to: %keytab_location
-
-cluster:
-  sample_host: localhost
