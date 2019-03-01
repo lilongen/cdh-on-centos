@@ -15,12 +15,12 @@ handlers:
   file:
     class: logging.handlers.RotatingFileHandler
     formatter: precise
-    filename: log/slk.log
+    filename: slk.log
     mode: a
   debugFile:
     class: logging.FileHandler
     formatter: precise
-    filename: log/slk-detail.log
+    filename: slk-detail.log
     mode: a
 
 loggers:
