@@ -25,7 +25,6 @@ def init_logger():
     logging_config: dict
     with open('{cwd}/conf/logging.yml'.format(**yml_vars), 'r') as f:
         logging_config = YAML().load(f)
-        print(logging_config)
     dictConfig(logging_config)
     logger = logging.getLogger()
 
@@ -33,7 +32,6 @@ def get_conf():
     global conf, l
     with open('{cwd}/security.cdh.yml'.format(**yml_vars), 'r') as f:
         template = Template(f.read())
-        print(template.render(**yml_vars))
         conf = YAML().load(template.render(**yml_vars))
 
 
@@ -139,7 +137,7 @@ def get_presence_and_yaml_diff():
             diff['user'][pk] = {}
             diff['user'][pk]['user'] = set(pv['user']) - set(definition[pk]['user'])
     conf['diff'] = diff
-    print(diff)
+    logger.debug(diff)
 
 
 def generate_keytab():
@@ -157,12 +155,11 @@ def generate_keytab():
     with open(sh, 'w') as f:
         f.write(cmds)
     ret = subprocess.check_output('bash {}'.format(sh), shell=True)
-    print(ret.decode())
+    logger.debug(ret.decode())
 
 
 def get_node_user_group():
     result = subprocess.check_output("grep g_ /etc/group | awk -F: '{print $1}'", shell=True)
-    print(result)
     groups = result.decode().split('\n')[0:-1]
     group_users = {}
     for g in groups:
@@ -176,9 +173,6 @@ def get_node_user_group():
 
 def main():
     init_logger()
-    logger.debug('hello')
-    logger.info('info hello')
-    return
     get_conf()
     bind_ldap()
     get_ldap_users()
@@ -192,4 +186,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
