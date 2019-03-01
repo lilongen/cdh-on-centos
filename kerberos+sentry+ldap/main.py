@@ -1,18 +1,27 @@
 #!/usr/bin/env python
 # coding: utf-8
+#
 
 from ruamel.yaml import YAML
 import ldap
 import re
 import subprocess
+import sys
+import os
+from jinja2 import Template
 
 conf: dict
 l: int
 
+tpl_vars = {
+    'pwd': os.path.dirname(sys.argv[0])
+}
 
 def get_conf():
-    global conf, l
-    with open('/Users/lilongen/cdh.security+ldap.yml', 'r') as f: conf = YAML().load(f)
+    global conf, l, tpl_vars
+    with open('{}/security.cdh.yml'.format(tpl_vars['pwd']), 'r') as f:
+        template = Template(f.read())
+        conf = YAML().load(template.render(**tpl_vars))
 
 
 def bind_ldap():
@@ -29,6 +38,7 @@ def unbind_ldap():
 
 def get_ldap_users():
     global conf, l
+    ldap_conf = conf['ldap']
     re_1st_ou = re.compile(r'CN=[^,]+,OU=([^,]+),')
     search_res = l.search(ldap_conf['base_dn'], ldap.SCOPE_SUBTREE, ldap_conf['filter'], ldap_conf['attrs'])
     users = []
@@ -100,7 +110,7 @@ def generate_group_user_directory_playbook():
             })
             
     #persist to file
-    with open('/Users/lilongen/kerberos+ldap.yml', 'w') as f: YAML().dump(playbook, f)
+    with open('{}/main.yml'.format(conf['ansible']['role_main_yml_to']), 'w') as f: YAML().dump(playbook, f)
 
 
 def get_presence_and_yaml_diff():
@@ -125,13 +135,17 @@ def generate_keytab():
     global conf, l
     cmd_tpl = 'kadmin -p {admin} -w {admin_pw} ktadd -k {keytab_to}/{username}.keytab'
     cmds = ''
-    kadmin_vars = conf['kerberos']
+    vars = conf['kerberos']
     for r_name, r in conf['role'].items():
         for u in r['user']:
-            kadmin_vars['username'] = u
-            cmds += cmd_tpl.format(**kadmin_vars) + '\n'
-    print(cmds)
+            vars['username'] = u
+            cmds += cmd_tpl.format(**vars) + '\n'
 
+    # persist to file
+    sh_file = '{}/generate.keytab.sh'.format(conf['kerberos']['keytab_to'])
+    with open(sh_file, 'w') as f:
+        YAML().dump(cmds, f)
+    subprocess.run(['bash', sh_file])
 
 def get_node_user_group():
     global conf, l
