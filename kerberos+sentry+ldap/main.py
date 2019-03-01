@@ -30,7 +30,7 @@ def init_logger():
 
 def get_conf():
     global conf, l
-    with open('{cwd}/security.cdh.yml'.format(**yml_vars), 'r') as f:
+    with open('{cwd}/conf/security.cdh.yml'.format(**yml_vars), 'r') as f:
         template = Template(f.read())
         conf = YAML().load(template.render(**yml_vars))
 
