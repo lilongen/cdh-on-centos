@@ -1,9 +1,9 @@
 ---
-- name: install cdh.cm.server
+- name: cdh security+ldap setting
   hosts: cm
   remote_user: root
   # remote_user: user
   # become: yes
   # become_method: sudo
   roles:
-    - cm
+    - common

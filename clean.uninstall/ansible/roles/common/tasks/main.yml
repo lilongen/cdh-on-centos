@@ -58,22 +58,27 @@
 
 - name: more clean
   ignore_errors: yes
-  command: "{{ item }}"
-  with_items:
+  shell: |
     # Remove Cloudera Manager Data
-    - umount cm_processes
-    - rm -Rf /usr/share/cmf /var/lib/cloudera* /var/cache/yum/cloudera* /var/log/cloudera* /var/run/cloudera*
+    umount -l cm_processes
+    rm -Rf /usr/share/cmf /var/lib/cloudera* /var/cache/yum/cloudera* /var/log/cloudera* /var/run/cloudera*
 
     # Remove the Cloudera Manager Lock File
     # On all Agent hosts, run this command to remove the Cloudera Manager lock file:
-    - rm /tmp/.scm_prepare_node.lock
+    rm /tmp/.scm_prepare_node* /tmp/scm*
 
     # Remove User Data
     # This step permanently removes all user data. To preserve the data, copy it to another cluster using the distcp command before starting the uninstall process. On all Agent hosts, run the following commands:
-    - rm -Rf /var/lib/flume-ng /var/lib/hadoop* /var/lib/hue /var/lib/navigator /var/lib/oozie /var/lib/solr /var/lib/sqoop* /var/lib/zookeeper
+    rm -Rf /var/lib/flume-ng /var/lib/hadoop* /var/lib/hue /var/lib/navigator /var/lib/oozie /var/lib/solr /var/lib/sqoop* /var/lib/zookeeper
 
     # Run the following command on each data drive on all Agent hosts (adjust the paths for the data drives on each host):
-    - rm -Rf data_drive_path/dfs data_drive_path/mapred data_drive_path/yarn
+    rm -Rf /sdb/dfs /sdb/mapred /sdb/yarn /sdb/impala
+
+    pkill -9 -f /usr/lib64/cmf/
+
+    pkill -9 -f scm_prepare_node
+  args:
+    executable: /bin/bash
 
 - name: notify - echo uptime
   command: uptime

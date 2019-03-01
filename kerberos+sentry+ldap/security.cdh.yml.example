@@ -1,0 +1,33 @@
+ldap:
+  url: ldap://221.224.33.71:389/
+  intra_url: ldap://172.17.100.10:389/
+
+  bind_dn: tqy@domain.oceansoft
+  bind_pw:  oceanitg2016!@#
+  base_dn: OU=云学堂,dc=domain,dc=oceansoft
+
+  filter: (&(objectCategory=person)(objectClass=user)(memberOf=cn=BDAI,OU=组,dc=domain,dc=oceansoft))
+  attrs: [sAMAccountName, mail, mobile]
+
+  filter1: (&(objectCategory=person)(objectClass=user)(|(department=大数据&DevOps)(department=南京研发团队)))
+  attrs1:
+    - sAMAccountName
+    - mail
+    - mobile
+
+role:
+  g_dev:
+    user:
+    workspace: /wsdev
+  g_prod:
+    user: [prt, pol]
+    workspace: /wsprod
+  
+kerberos:
+  admin: root/admin
+  admin_pw: Uydc.2910
+  keytab_to: ./ansible/common/tasks/
+
+cluster:
+  sample_host: localhost
+  playbook: 
