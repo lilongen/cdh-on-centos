@@ -10,7 +10,6 @@ handlers:
   console:
     class: logging.StreamHandler
     formatter: brief
-    level: INFO
     stream: ext://sys.stdout
   file:
     class: logging.handlers.RotatingFileHandler
@@ -25,10 +24,10 @@ handlers:
 
 loggers:
   console:
-    level : INFO
+    level: DEBUG
     handlers: [console]
   file:
-    level: INFO
+    level: WARNING
     handlers: [console, file]
     propagate: no
   debugFile:
