@@ -100,7 +100,7 @@ def generate_group_user_directory_playbook():
             })
             
     #generate deleted part
-    for r_name in conf['diff']['group']:
+    for r_name in conf['diff_del']['group']:
         playbook.append({
             'name': 'Delete group "{}"'.format(r_name),
             'group': {
@@ -108,7 +108,7 @@ def generate_group_user_directory_playbook():
                 'state': 'absent'
             }
         })
-    for r_name, r in conf['diff']['user'].items():
+    for r_name, r in conf['diff_del']['user'].items():
         for u in r['user']:
             playbook.append({
                 'name': 'Delete user "{}" '.format(u),
@@ -136,13 +136,15 @@ def get_presence_and_yaml_diff():
         else:
             diff['user'][pk] = {}
             diff['user'][pk]['user'] = set(pv['user']) - set(definition[pk]['user'])
-    conf['diff'] = diff
+    conf['diff_del'] = diff
     logger.debug(diff)
 
 
-def generate_keytab():
-    addprinc_tpl = 'kadmin -p {admin} -w {admin_pw} addprinc -pw lle {username}'
-    ktadd_tpl = 'kadmin -p {admin} -w {admin_pw} ktadd -k {keytab_to}/{username}.keytab {username}'
+def add_or_del_principle():
+    kadmin_with_credential = 'kadmin -p {admin} -w {admin_pw} '
+    addprinc_tpl = kadmin_with_credential + 'addprinc -pw lle {username}'
+    ktadd_tpl = kadmin_with_credential + 'ktadd -k {keytab_to}/{username}.keytab {username}'
+    delprinc_tpl = kadmin_with_credential + 'delprinc -force {username}'
     cmds = ''
     vars = conf['kerberos']
     for r_name, r in conf['role'].items():
@@ -150,12 +152,17 @@ def generate_keytab():
             vars['username'] = u
             cmds += addprinc_tpl.format(**vars) + '\n'
             cmds += ktadd_tpl.format(**vars) + '\n'
+    for r_name, r in conf['diff_del']['user'].items():
+        logger.debug(r'user')
+        for u in r['user']:
+            vars['username'] = u
+            cmds += delprinc_tpl.format(**vars) + '\n'
 
-    sh = '{}/add.princ.with.keytab.sh'.format(conf['kerberos']['keytab_to'])
+    sh = '{}/add.or.del.principle.sh'.format(conf['kerberos']['keytab_to'])
     with open(sh, 'w') as f:
         f.write(cmds)
-    ret = subprocess.check_output('bash {}'.format(sh), shell=True)
-    logger.debug(ret.decode())
+    ret = subprocess.call('bash {}'.format(sh), shell=True)
+    logger.debug(ret)
 
 
 def get_node_user_group():
@@ -179,7 +186,7 @@ def main():
     get_node_user_group()
     get_presence_and_yaml_diff()
     generate_group_user_directory_playbook()
-    generate_keytab()
+    add_or_del_principle()
     get_node_user_group()
     unbind_ldap()
 
