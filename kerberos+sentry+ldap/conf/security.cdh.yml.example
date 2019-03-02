@@ -19,6 +19,8 @@ role:
 
 ansible:
   role_main_yml_to: {{ cwd }}/ansible/roles/common/tasks
+  inventory: /etc/ansible/hosts
+  cdh_host_pattern: uydc
 
 kerberos:
   admin: %admin
