@@ -142,7 +142,7 @@ def get_presence_and_yaml_diff():
     logger.debug(diff)
 
 
-def add_or_del_principle():
+def operate_principle():
     kadmin_with_credential = 'kadmin -p {admin} -w {admin_pw} '
     addprinc_tpl = kadmin_with_credential + 'addprinc -pw lle {username}'
     ktadd_tpl = kadmin_with_credential + 'ktadd -k {keytab_to}/{username}.keytab {username}'
@@ -181,28 +181,30 @@ def get_node_user_group():
 
 def distribute_keytab():
     mailer = Mailer()
-    mailer.send(['lile@yxt.com', 'lile@yxt.com'], {
-        'subject': 'test',
+    tolist = []
+    for r_name, r in conf['role'].items():
+        tolist.append(r['user'])
+
+    mailer.send(tolist, {
+        'subject': 'Distribute: CDH cluster kerberos principle keytab',
         'from': 'jenkins@yxt.com',
-        'msg': 'hello world',
+        'msg': 'Distribute: CDH cluster kerberos principle keytab',
         'files': ['./ksl.log', './main.py']
     })
 
 def main():
     init_logger()
-    distribute_keytab()
-
-    return
-
     get_conf()
     bind_ldap()
     get_ldap_users()
+    unbind_ldap()
+
     get_node_user_group()
     get_presence_and_yaml_diff()
     generate_group_user_directory_playbook()
-    add_or_del_principle()
-    get_node_user_group()
-    unbind_ldap()
+    operate_principle()
+
+    distribute_keytab()
 
 
 if __name__ == "__main__":
