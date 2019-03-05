@@ -11,6 +11,7 @@ import os
 from jinja2 import Template
 import logging
 from logging.config import dictConfig
+from util.mailer import Mailer
 
 logger: object
 conf: dict
@@ -27,6 +28,7 @@ def init_logger():
         logging_config = YAML().load(f)
     dictConfig(logging_config)
     logger = logging.getLogger()
+
 
 def get_conf():
     global conf, l
@@ -177,9 +179,21 @@ def get_node_user_group():
     
     conf['presence_role'] = group_users
 
+def distribute_keytab():
+    mailer = Mailer()
+    mailer.send(['lile@yxt.com', 'lile@yxt.com'], {
+        'subject': 'test',
+        'from': 'jenkins@yxt.com',
+        'msg': 'hello world',
+        'files': ['./ksl.log', './main.py']
+    })
 
 def main():
     init_logger()
+    distribute_keytab()
+
+    return
+
     get_conf()
     bind_ldap()
     get_ldap_users()
