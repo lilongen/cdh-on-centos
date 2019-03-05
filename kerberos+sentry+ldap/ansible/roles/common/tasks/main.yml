@@ -1,0 +1,130 @@
+- name: Ensure group "g_dev" exists
+  group:
+    name: g_dev
+    state: present
+- name: Ensure directory "/wsdev" exists
+  file:
+    path: /wsdev
+    state: directory
+    mode: '0755'
+    group: g_dev
+- name: User "lile" info
+  user:
+    name: lile
+    state: present
+    group: g_dev
+- name: User "wangjd" info
+  user:
+    name: wangjd
+    state: present
+    group: g_dev
+- name: User "luoyw" info
+  user:
+    name: luoyw
+    state: present
+    group: g_dev
+- name: User "baosy" info
+  user:
+    name: baosy
+    state: present
+    group: g_dev
+- name: User "liuzl" info
+  user:
+    name: liuzl
+    state: present
+    group: g_dev
+- name: User "wanglj" info
+  user:
+    name: wanglj
+    state: present
+    group: g_dev
+- name: User "guoqp" info
+  user:
+    name: guoqp
+    state: present
+    group: g_dev
+- name: User "liukl" info
+  user:
+    name: liukl
+    state: present
+    group: g_dev
+- name: User "tangzx" info
+  user:
+    name: tangzx
+    state: present
+    group: g_dev
+- name: User "maocy" info
+  user:
+    name: maocy
+    state: present
+    group: g_dev
+- name: User "wangxt" info
+  user:
+    name: wangxt
+    state: present
+    group: g_dev
+- name: User "zhyu" info
+  user:
+    name: zhyu
+    state: present
+    group: g_dev
+- name: User "jingwz" info
+  user:
+    name: jingwz
+    state: present
+    group: g_dev
+- name: User "xuxt" info
+  user:
+    name: xuxt
+    state: present
+    group: g_dev
+- name: User "liuc" info
+  user:
+    name: liuc
+    state: present
+    group: g_dev
+- name: User "yujun" info
+  user:
+    name: yujun
+    state: present
+    group: g_dev
+- name: User "sunxf" info
+  user:
+    name: sunxf
+    state: present
+    group: g_dev
+- name: User "suxj" info
+  user:
+    name: suxj
+    state: present
+    group: g_dev
+- name: User "yangwb" info
+  user:
+    name: yangwb
+    state: present
+    group: g_dev
+- name: User "yyc" info
+  user:
+    name: yyc
+    state: present
+    group: g_dev
+- name: Ensure group "g_prod" exists
+  group:
+    name: g_prod
+    state: present
+- name: Ensure directory "/wsprod" exists
+  file:
+    path: /wsprod
+    state: directory
+    mode: '0755'
+    group: g_prod
+- name: User "prt" info
+  user:
+    name: prt
+    state: present
+    group: g_prod
+- name: User "pol" info
+  user:
+    name: pol
+    state: present
+    group: g_prod
