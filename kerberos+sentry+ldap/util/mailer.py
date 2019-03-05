@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 #
+# known issue:
+#   cause python3.7 openssl changes, smtp = smtplib.SMTP().starttls() will failed
+#   so this mailer does not work at python3.7
+#
 
 import smtplib
 from email.header import Header
@@ -33,7 +37,7 @@ class Mailer():
         smtp = smtplib.SMTP()
         smtp.connect(self.server)
         smtp.ehlo()
-        smtp.starttls()
+        smtp.starttls() # does not work in py3.7
         smtp.ehlo()
         smtp.login(self.username, self.password)
         self.smtp = smtp
