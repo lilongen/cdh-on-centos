@@ -1,28 +1,36 @@
 ldap:
-  url: ldap://%host:389/
+  url: ldap://10.10.105.235:389/
+  intra_url: ldap://172.17.100.10:389/
 
-  bind_dn: %bind_dn
-  bind_pw: %bind_pw
-  base_dn: %base_db
+  bind_dn: %dn
+  bind_pw:  %pwd
+  base_dn: OU=xxx,dc=domain,dc=oceansoft
 
   filter: (&(objectCategory=person)(objectClass=user)(memberOf=cn=BDAI,OU=组,dc=domain,dc=oceansoft))
   attrs: [sAMAccountName, mail, mobile]
-
 
 role:
   g_dev:
     user:
     workspace: /wsdev
   g_prod:
-    user: [prt, pol]
+    user: [prodrt, prodol]
     workspace: /wsprod
 
 ansible:
-  role_main_yml_to: {{ cwd }}/ansible/roles/common/tasks
   inventory: /etc/ansible/hosts
+  group_user_playbook: {{ cwd }}/output/ansible/group_user.playbook.yml
   cdh_host_pattern: uydc
 
 kerberos:
-  admin: %admin
-  admin_pw: %admin_pw
-  output_to: %keytab_location
+  realm: UYDC.COM
+  admin: root/admin
+  admin_pw: %pwd
+  output_to: {{ cwd }}/output/kerberos
+
+mail:
+  server: %server
+  username: %username
+  password: %pwd
+  sender: %sender
+

@@ -195,7 +195,11 @@ def get_node_user_group():
     conf['presence_role'] = group_users
 
 def distribute_keytab():
-    mailer = Mailer()
+    info = conf['mail']
+    mailer = Mailer(server=info['server'],
+                    sender=info['sender'],
+                    username=info['username'],
+                    password=info['password'])
     user_keytab = {}
     for r_name, r in conf['role'].items():
         for username in r['user']:
