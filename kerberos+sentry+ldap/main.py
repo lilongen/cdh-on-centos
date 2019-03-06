@@ -181,30 +181,42 @@ def get_node_user_group():
 
 def distribute_keytab():
     mailer = Mailer()
-    tolist = []
+    user_keytab = {}
     for r_name, r in conf['role'].items():
-        tolist.append(r['user'])
+        for username in r['user']:
+            user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['keytab_to'], username)
 
-    mailer.send(tolist, {
-        'subject': 'Distribute: CDH cluster kerberos principle keytab',
-        'from': 'jenkins@yxt.com',
-        'msg': 'Distribute: CDH cluster kerberos principle keytab',
-        'files': ['./ksl.log', './main.py']
-    })
+    f_tpl = open('{cwd}/conf/mailtpl.keytab.distribute.yml'.format(**yml_vars), 'r')
+    tpl = f_tpl.read()
+    f_tpl.close()
+    for username, keytab in user_keytab.items():
+        if username != 'lile':
+            continue
+
+        yml_vars['name'] = username
+        mail = YAML().load(Template(tpl).render(**yml_vars))
+        mail['to'] = '%s@yxt.com' % username
+        mail['files'] = [keytab]
+        logger.info('Mail {}.keytab to {} ...'.format(username, mail['to']))
+        mailer.send([mail['to']], mail)
+
 
 def main():
     init_logger()
     get_conf()
+
     bind_ldap()
     get_ldap_users()
     unbind_ldap()
+
+    distribute_keytab()
+    return
 
     get_node_user_group()
     get_presence_and_yaml_diff()
     generate_group_user_directory_playbook()
     operate_principle()
 
-    distribute_keytab()
 
 
 if __name__ == "__main__":

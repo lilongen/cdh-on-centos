@@ -118,13 +118,13 @@
     state: directory
     mode: '0755'
     group: g_prod
-- name: User "prt" info
+- name: User "prodrt" info
   user:
-    name: prt
+    name: prodrt
     state: present
     group: g_prod
-- name: User "pol" info
+- name: User "prodol" info
   user:
-    name: pol
+    name: prodol
     state: present
     group: g_prod

@@ -47,34 +47,35 @@ class Mailer():
         self.smtp.quit()
 
 
-    def _append_attach(self, msg, files):
+    def _append_attach(self, mail, files):
         for file in files:
+            print(file)
             f = open(file, 'rb')
             attach = MIMEApplication(f.read())
             attach.add_header('Content-Disposition',
                               'attachment',
                               filename=('utf-8', '', file.split('/')[-1]))
-            msg.attach(attach)
+            mail.attach(attach)
             f.close()
 
 
-    def assemble(self, msg: dict):
+    def assemble(self, mail: dict):
         mime = MIMEMultipart()  # 中文需参数‘utf-8’，单字节字符不需要
-        puretext = MIMEText(msg['msg'], 'plain', 'utf-8')
+        puretext = MIMEText(mail['msg'], 'plain', 'utf-8')
         mime.attach(puretext)
-        mime['Subject'] = Header(msg['subject'], 'utf-8').encode()
-        mime['To'] = msg['to']
+        mime['Subject'] = Header(mail['subject'], 'utf-8').encode()
+        mime['To'] = mail['to']
         mime['From'] = self.sender
-        if msg.get('from') != None:
-            mime['From'] = msg['from']
+        if mail.get('from') != None:
+            mime['From'] = mail['from']
 
-        files = msg.get('files')
+        files = mail.get('files')
         if files is not None:
             self._append_attach(mime, files)
         return mime
 
 
-    def send(self, tolist: list, msg: dict):
+    def send(self, tolist: list, mail: dict):
         for to in tolist:
-            msg['to'] = to
-            self.smtp.sendmail(self.sender, to, self.assemble(msg).as_string())
+            mail['to'] = to
+            self.smtp.sendmail(self.sender, to, self.assemble(mail).as_string())
