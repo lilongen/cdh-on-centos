@@ -25,4 +25,4 @@ ansible:
 kerberos:
   admin: %admin
   admin_pw: %admin_pw
-  keytab_to: %keytab_location
+  output_to: %keytab_location

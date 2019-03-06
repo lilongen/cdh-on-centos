@@ -160,7 +160,7 @@ def get_presence_and_yaml_diff():
 def operate_principle():
     kadmin_with_credential = 'kadmin -p {admin} -w {admin_pw} '
     addprinc_tpl = kadmin_with_credential + 'addprinc -pw lle {username}'
-    ktadd_tpl = kadmin_with_credential + 'ktadd -k {keytab_to}/{username}.keytab {username}'
+    ktadd_tpl = kadmin_with_credential + 'ktadd -k {output_to}/{username}.keytab {username}'
     delprinc_tpl = kadmin_with_credential + 'delprinc -force {username}'
     cmds = ''
     vars = conf['kerberos']
@@ -175,7 +175,7 @@ def operate_principle():
             vars['username'] = u
             cmds += delprinc_tpl.format(**vars) + '\n'
 
-    sh = '{}/add.or.del.principle.sh'.format(conf['kerberos']['keytab_to'])
+    sh = '{}/add.or.del.principle.sh'.format(conf['kerberos']['output_to'])
     with open(sh, 'w') as f:
         f.write(cmds)
     ret = subprocess.call('bash {}'.format(sh), shell=True)
@@ -199,7 +199,7 @@ def distribute_keytab():
     user_keytab = {}
     for r_name, r in conf['role'].items():
         for username in r['user']:
-            user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['keytab_to'], username)
+            user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['output_to'], username)
 
     f_tpl = open('{cwd}/conf/mailtpl.keytab.distribute.yml'.format(**yml_vars), 'r')
     tpl = f_tpl.read()
@@ -231,10 +231,10 @@ def main():
 
     logger.info('generate user/group playbook ... ')
     generate_group_user_directory_playbook()
-    play_group_user_playbook()
+    #play_group_user_playbook()
 
     logger.info('generate user/group playbook ... ')
-    operate_principle()
+    #operate_principle()
 
     distribute_keytab()
 

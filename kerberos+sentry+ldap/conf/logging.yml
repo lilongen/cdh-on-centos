@@ -14,12 +14,12 @@ handlers:
   file:
     class: logging.handlers.RotatingFileHandler
     formatter: precise
-    filename: ksl.log
+    filename: ./log/ksl.log
     mode: a
   debugFile:
     class: logging.FileHandler
     formatter: precise
-    filename: ksl-debug.log
+    filename: ./log/ksl-debug.log
     mode: a
 
 loggers:

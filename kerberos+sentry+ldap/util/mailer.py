@@ -13,7 +13,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 class Mailer():
-    server = 'mail.yxt.com:587'
+    #server = 'mail.yxt.com:587'
+    server = '10.10.105.23:587'
     sender = 'jenkins@yxt.com'
     username = 'jenkins'
     password = 'pwdasdwx'
