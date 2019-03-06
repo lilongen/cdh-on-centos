@@ -19,7 +19,7 @@ handlers:
   debugFile:
     class: logging.FileHandler
     formatter: precise
-    filename: ksl-detail.log
+    filename: ksl-debug.log
     mode: a
 
 loggers:

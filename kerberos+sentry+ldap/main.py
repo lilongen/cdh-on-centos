@@ -71,17 +71,17 @@ def get_ldap_users():
 
 
 def generate_group_user_directory_playbook():
-    playbook = []
+    tasks = []
     #generate new part
     for r_name, r in conf['role'].items():
-        playbook.append({
+        tasks.append({
             'name': 'Ensure group "{}" exists'.format(r_name),
             'group': {
                 'name': r_name,
                 'state': 'present'
             }
         })
-        playbook.append({
+        tasks.append({
             'name': 'Ensure directory "{}" exists'.format(r['workspace']),
             'file': {
                 'path': r['workspace'],
@@ -92,7 +92,7 @@ def generate_group_user_directory_playbook():
         })
 
         for u in r['user']:
-            playbook.append({
+            tasks.append({
                 'name': 'User "{}" info'.format(u),
                 'user': {
                     'name': u,
@@ -103,7 +103,7 @@ def generate_group_user_directory_playbook():
             
     #generate deleted part
     for r_name in conf['diff_del']['group']:
-        playbook.append({
+        tasks.append({
             'name': 'Delete group "{}"'.format(r_name),
             'group': {
                 'name': r_name,
@@ -112,16 +112,31 @@ def generate_group_user_directory_playbook():
         })
     for r_name, r in conf['diff_del']['user'].items():
         for u in r['user']:
-            playbook.append({
+            tasks.append({
                 'name': 'Delete user "{}" '.format(u),
                 'user': {
                     'name': u,
                     'state': 'absent'
                 }
             })
-            
-    #persist to file
-    with open('{}/main.yml'.format(conf['ansible']['role_main_yml_to']), 'w') as f: YAML().dump(playbook, f)
+
+    playbook = [{
+        'name': 'operating cluster hosts group and user',
+        'hosts': 'all',
+        'user': 'root',
+        'tasks': tasks
+    }]
+    with open(conf['ansible']['group_user_playbook'], 'w') as f:
+        YAML().dump(playbook, f)
+
+
+def play_group_user_playbook():
+    ansible_cmd = 'ansible-playbook -i {inventory} {playbook}'.format(
+        inventory=conf['ansible']['inventory'],
+        playbook=conf['ansible']['group_user_playbook']
+    )
+    ret = subprocess.call(ansible_cmd, shell=True)
+    logger.debug(ret)
 
 
 def get_presence_and_yaml_diff():
@@ -192,8 +207,8 @@ def distribute_keytab():
     for username, keytab in user_keytab.items():
         if username != 'lile':
             continue
-
         yml_vars['name'] = username
+        yml_vars['kerberos_realm'] = conf['kerberos']['realm']
         mail = YAML().load(Template(tpl).render(**yml_vars))
         mail['to'] = '%s@yxt.com' % username
         mail['files'] = [keytab]
@@ -206,17 +221,22 @@ def main():
     get_conf()
 
     bind_ldap()
+    logger.info('get valid ldap group users ... ')
     get_ldap_users()
     unbind_ldap()
 
-    distribute_keytab()
-    return
-
+    logger.info('get cluster presence group and user information ... ')
     get_node_user_group()
     get_presence_and_yaml_diff()
+
+    logger.info('generate user/group playbook ... ')
     generate_group_user_directory_playbook()
+    play_group_user_playbook()
+
+    logger.info('generate user/group playbook ... ')
     operate_principle()
 
+    distribute_keytab()
 
 
 if __name__ == "__main__":
