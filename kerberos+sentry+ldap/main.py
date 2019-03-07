@@ -205,7 +205,7 @@ def distribute_keytab():
         for username in r['user']:
             user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['output_to'], username)
 
-    f_tpl = open('{cwd}/conf/mailtpl.keytab.distribute.yml'.format(**yml_vars), 'r')
+    f_tpl = open('{cwd}/conf/mail.keytab.distribute.tpl.yml'.format(**yml_vars), 'r')
     tpl = f_tpl.read()
     f_tpl.close()
     for username, keytab in user_keytab.items():
