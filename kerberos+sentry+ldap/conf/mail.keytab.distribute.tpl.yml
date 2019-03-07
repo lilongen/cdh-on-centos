@@ -1,0 +1,17 @@
+subject: CDH.admin - Cluster kerberos principle keytab file
+
+from: cdh.admin@yxt.com
+
+msg: "
+CDH cluster kerberos principle keytab file\n
+
+Hi, {{ name }}\n
+Attached is the keytab file of your kerberos principle {{ name }}@{{ kerberos_realm }}.\n
+{{ name }}.keytab\n
+
+DO NOT REPLY THIS EMAIL!\n
+
+
+
+Thanks,\n
+CDH.admin"
