@@ -1,6 +1,6 @@
 ldap:
-  url: ldap://10.10.105.235:389/
-  intra_url: ldap://172.17.100.10:389/
+  url: ldap://%host:389/
+  intra_url: ldap://%host:389/
 
   bind_dn: %dn
   bind_pw:  %pwd
