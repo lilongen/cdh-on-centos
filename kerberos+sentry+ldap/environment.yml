@@ -1,0 +1,6 @@
+name: ksl python env
+dependencies:
+  - python=3.6
+  - ruamel.yaml
+  - python-ldap
+  - jinja2
