@@ -13,6 +13,8 @@ import logging
 from logging.config import dictConfig
 from util.mailer import Mailer
 
+Dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
+
 logger: object
 conf: dict
 l: int
@@ -20,6 +22,7 @@ l: int
 yml_vars = {
     'cwd': os.path.dirname(sys.argv[0])
 }
+
 
 def init_logger():
     global logger
@@ -131,6 +134,9 @@ def generate_group_user_directory_playbook():
 
 
 def play_group_user_playbook():
+    if Dryrun:
+        return
+
     ansible_cmd = 'ansible-playbook -i {inventory} {playbook}'.format(
         inventory=conf['ansible']['inventory'],
         playbook=conf['ansible']['group_user_playbook']
@@ -170,7 +176,6 @@ def operate_principle():
             cmds += addprinc_tpl.format(**vars) + '\n'
             cmds += ktadd_tpl.format(**vars) + '\n'
     for r_name, r in conf['diff_del']['user'].items():
-        logger.debug(r'user')
         for u in r['user']:
             vars['username'] = u
             cmds += delprinc_tpl.format(**vars) + '\n'
@@ -178,8 +183,11 @@ def operate_principle():
     sh = '{}/add.or.del.principle.sh'.format(conf['kerberos']['output_to'])
     with open(sh, 'w') as f:
         f.write(cmds)
+
+    if Dryrun:
+        return
     ret = subprocess.call('bash {}'.format(sh), shell=True)
-    logger.debug(ret)
+    logger.info(ret)
 
 
 def get_node_user_group():
@@ -209,23 +217,24 @@ def distribute_keytab():
     tpl = f_tpl.read()
     f_tpl.close()
     for username, keytab in user_keytab.items():
-        if username != 'lile':
-            continue
         yml_vars['name'] = username
         yml_vars['kerberos_realm'] = conf['kerberos']['realm']
         mail = YAML().load(Template(tpl).render(**yml_vars))
         mail['to'] = '%s@yxt.com' % username
         mail['files'] = [keytab]
-        logger.info('Mail {}.keytab to {} ...'.format(username, mail['to']))
+        logger.info('mail {}.keytab file to {} ...'.format(username, mail['to']))
+        if Dryrun:
+            continue
         mailer.send([mail['to']], mail)
 
 
 def main():
+    print('init app ...')
     init_logger()
     get_conf()
 
-    bind_ldap()
     logger.info('get valid ldap group users ... ')
+    bind_ldap()
     get_ldap_users()
     unbind_ldap()
 
@@ -235,11 +244,14 @@ def main():
 
     logger.info('generate user/group playbook ... ')
     generate_group_user_directory_playbook()
+
+    logger.info('run playbook ... ')
     play_group_user_playbook()
 
-    logger.info('generate user/group playbook ... ')
+    logger.info('operate kerberos principle ... ')
     operate_principle()
 
+    logger.info('distribute user keytab ... ')
     distribute_keytab()
 
 
