@@ -235,10 +235,10 @@ def main():
 
     logger.info('generate user/group playbook ... ')
     generate_group_user_directory_playbook()
-    #play_group_user_playbook()
+    play_group_user_playbook()
 
     logger.info('generate user/group playbook ... ')
-    #operate_principle()
+    operate_principle()
 
     distribute_keytab()
 
