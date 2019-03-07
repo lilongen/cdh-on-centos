@@ -93,7 +93,7 @@ def generate_group_user_directory_playbook():
 
         for u in r['user']:
             tasks.append({
-                'name': 'User "{}" info'.format(u),
+                'name': 'Ensure user "{}" exist, and belong to group "{}'"".format(u, r_name),
                 'user': {
                     'name': u,
                     'state': 'present',
@@ -121,7 +121,7 @@ def generate_group_user_directory_playbook():
             })
 
     playbook = [{
-        'name': 'operating cluster hosts group and user',
+        'name': 'Operating cluster hosts group, user, directory ...',
         'hosts': 'all',
         'user': 'root',
         'tasks': tasks
