@@ -1,6 +1,8 @@
 name: e.py36
+channels:
+  - defaults
 dependencies:
-  - python=3.6
-  - ruamel.yaml
-  - python-ldap
-  - jinja2
+  - pip:
+    - jinja2
+    - python-ldap
+    - ruamel.yaml
