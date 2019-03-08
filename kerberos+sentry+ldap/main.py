@@ -8,7 +8,6 @@ import re
 import subprocess
 import sys
 import os
-import time
 import logging
 from jinja2 import Template
 from logging.config import dictConfig
@@ -255,7 +254,6 @@ def distribute_keytab():
         if Dryrun:
             continue
         mailer.send([mail['to']], mail)
-        time.sleep(3)
 
 
 def main():
