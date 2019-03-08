@@ -1,0 +1,46 @@
+# coding: utf-8
+
+import subprocess
+from .operator import Operator
+
+class KerberosOperator(Operator):
+
+    def __init__(self, dryrun, logger, conf, util, tpl_vars):
+        self.dryrun = dryrun
+        self.logger = logger
+        self.conf = conf
+        self.util = conf
+        self.tpl_vars = tpl_vars
+
+
+    def execute(self):
+        self.operate_principle()
+
+
+    def operate_principle(self):
+        (dryrun, logger, conf, util, tpl_vars) = (self.dryrun, self.logger, self.conf, self.util, self.tpl_vars)
+        kadmin_with_credential = 'kadmin -p {admin} -w {admin_pw} '
+        addprinc_tpl = kadmin_with_credential + 'addprinc -pw lle {username}'
+        ktadd_tpl = kadmin_with_credential + 'ktadd -k {keytab_output_to}/{username}.keytab {username}'
+        delprinc_tpl = kadmin_with_credential + 'delprinc -force {username}'
+        cmds = ''
+        vars = conf['kerberos']
+        for r_name, r in conf['role'].items():
+            for u in r['user']:
+                vars['username'] = u
+                cmds += addprinc_tpl.format(**vars) + '\n'
+                cmds += ktadd_tpl.format(**vars) + '\n'
+        for r_name, r in conf['diff_del']['user'].items():
+            for u in r['user']:
+                vars['username'] = u
+                cmds += delprinc_tpl.format(**vars) + '\n'
+
+        util.mkdir(conf['kerberos']['todo'])
+        sh = conf['kerberos']['todo']
+        with open(sh, 'w') as f:
+            f.write(cmds)
+
+        if dryrun:
+            return
+        ret = subprocess.call('bash {}'.format(sh), shell=True)
+        logger.info(ret)

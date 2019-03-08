@@ -15,8 +15,7 @@ from logging.config import dictConfig
 from util.mailer import Mailer
 from util.utility import Utility
 
-
-Dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
+dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
 
 logger: logging.Logger
 conf: dict
@@ -174,7 +173,7 @@ def play_group_user_playbook():
         playbook=conf['ansible']['todo']
     )
     logger.info(ansible_cmd)
-    if Dryrun:
+    if dryrun:
         return
     ret = subprocess.call(ansible_cmd, shell=True)
     logger.debug(ret)
@@ -195,7 +194,7 @@ def set_role_hdfs_workspace():
     f = open(sh, 'w')
     f.write('\n'.join(cmds) + '\n')
     f.close()
-    if Dryrun:
+    if dryrun:
         return
     subprocess.call('bash %s' % sh, shell=True)
 
@@ -222,7 +221,7 @@ def operate_principle():
     with open(sh, 'w') as f:
         f.write(cmds)
 
-    if Dryrun:
+    if dryrun:
         return
     ret = subprocess.call('bash {}'.format(sh), shell=True)
     logger.info(ret)
@@ -249,7 +248,7 @@ def distribute_keytab():
         mail['to'] = '%s@yxt.com' % username
         mail['files'] = [keytab]
         logger.info('mail {}.keytab file to {} ...'.format(username, mail['to']))
-        if Dryrun:
+        if dryrun:
             continue
         mailer.send([mail['to']], mail)
 
