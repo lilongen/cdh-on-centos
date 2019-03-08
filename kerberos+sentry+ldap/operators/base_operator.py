@@ -3,13 +3,13 @@
 from abc import ABCMeta, abstractmethod
 
 
-class Operator(object):
+class BaseOperator(object):
     __metaclass__ = ABCMeta
 
     @property
     def name(self):
         """
-        :return: the operator name
+        :return: the operators name
         :rtype: unicode
         """
         raise NotImplementedError()

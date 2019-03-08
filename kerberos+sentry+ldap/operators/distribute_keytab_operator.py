@@ -1,22 +1,23 @@
 # coding: utf-8
 
 from ruamel.yaml import YAML
-from .operator import Operator
-from ..util.mailer import Mailer
+from jinja2 import Template
+from util.mailer import Mailer
+from .base_operator import BaseOperator
 
 
-class DistributeKeytabOperator(Operator):
+class DistributeKeytabOperator(BaseOperator):
 
     def __init__(self, dryrun, logger, conf, util, tpl_vars):
         self.dryrun = dryrun
         self.logger = logger
         self.conf = conf
-        self.util = conf
+        self.util = util
         self.tpl_vars = tpl_vars
 
 
     def execute(self):
-        self.set_role_hdfs_workspace()
+        self.distribute_keytab()
 
 
     def distribute_keytab(self):

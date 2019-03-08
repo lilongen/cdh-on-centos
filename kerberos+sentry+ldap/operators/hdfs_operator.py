@@ -1,16 +1,16 @@
 # coding: utf-8
 
 import subprocess
-from .operator import Operator
+from .base_operator import BaseOperator
 
 
-class HdfsOperator(Operator):
+class HdfsOperator(BaseOperator):
 
     def __init__(self, dryrun, logger, conf, util, tpl_vars):
         self.dryrun = dryrun
         self.logger = logger
         self.conf = conf
-        self.util = conf
+        self.util = util
         self.tpl_vars = tpl_vars
 
 

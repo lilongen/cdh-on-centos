@@ -2,16 +2,16 @@
 
 from ruamel.yaml import YAML
 import subprocess
-from .operator import Operator
+from .base_operator import BaseOperator
 
 
-class AnsibleOperator(Operator):
+class AnsibleOperator(BaseOperator):
 
     def __init__(self, dryrun, logger, conf, util, tpl_vars):
         self.dryrun = dryrun
         self.logger = logger
         self.conf = conf
-        self.util = conf
+        self.util = util
         self.tpl_vars = tpl_vars
 
     def execute(self):
