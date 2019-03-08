@@ -21,10 +21,7 @@ logger: object
 conf: dict
 l: int
 util = Utility()
-
-yml_vars = {
-    'cwd': os.path.dirname(sys.argv[0])
-}
+yml_vars = {'cwd': os.path.dirname(sys.argv[0])}
 
 
 def init_logger():
@@ -261,7 +258,7 @@ def main():
     init_logger()
     get_conf()
 
-    logger.info('get valid ldap group users ...')
+    logger.info('get AD/ldap group users ...')
     bind_ldap()
     get_ldap_users()
     unbind_ldap()
@@ -273,7 +270,7 @@ def main():
     logger.info('generate user/group playbook ...')
     generate_group_user_directory_playbook()
 
-    logger.info('run playbook ... ')
+    logger.info('run playbook ...')
     play_group_user_playbook()
 
     logger.info('operate role hdfs directory ...')
