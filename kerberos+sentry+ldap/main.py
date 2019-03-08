@@ -8,10 +8,13 @@ import re
 import subprocess
 import sys
 import os
-from jinja2 import Template
+import time
 import logging
+from jinja2 import Template
 from logging.config import dictConfig
 from util.mailer import Mailer
+from util.utility import Utility
+
 
 Dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
 
@@ -73,6 +76,37 @@ def get_ldap_users():
     conf['role']['g_dev']['user'] = user_ids
 
 
+def get_node_user_group():
+    result = subprocess.check_output("grep g_ /etc/group | awk -F: '{print $1}'", shell=True)
+    groups = result.decode().split('\n')[0:-1]
+    group_users = {}
+    for g in groups:
+        group_users[g] = {}
+        result = subprocess.check_output('lid -n -g {}'.format(g), shell=True)
+        users = result.decode().split('\n')[0:-1]
+        group_users[g]['user'] = list(map(lambda x: re.sub('^\s+', '', x), users))
+
+    conf['presence_role'] = group_users
+
+
+def get_presence_and_yaml_diff():
+    presence = conf['presence_role']
+    definition = conf['role']
+    diff = {
+        'group': [],
+        'user': {}
+    }
+    for pk, pv in presence.items():
+        if definition.get(pk) is None:
+            diff['group'].append(pk)
+            diff['user'][pk] = pv
+        else:
+            diff['user'][pk] = {}
+            diff['user'][pk]['user'] = set(pv['user']) - set(definition[pk]['user'])
+    conf['diff_del'] = diff
+    logger.debug(diff)
+
+
 def generate_group_user_directory_playbook():
     tasks = []
     #generate new part
@@ -100,7 +134,8 @@ def generate_group_user_directory_playbook():
                 'user': {
                     'name': u,
                     'state': 'present',
-                    'group': r_name
+                    'group': r_name,
+                    'home': '{worksapce}/{user}'.format(r['workspace'], u)
                 }
             })
             
@@ -119,7 +154,8 @@ def generate_group_user_directory_playbook():
                 'name': 'Delete user "{}" '.format(u),
                 'user': {
                     'name': u,
-                    'state': 'absent'
+                    'state': 'absent',
+                    'remove': 'yes'
                 }
             })
 
@@ -129,38 +165,41 @@ def generate_group_user_directory_playbook():
         'user': 'root',
         'tasks': tasks
     }]
-    with open(conf['ansible']['group_user_playbook'], 'w') as f:
+    Utility.mkdir(conf['ansible']['todo'])
+    with open(conf['ansible']['todo'], 'w') as f:
         YAML().dump(playbook, f)
 
 
 def play_group_user_playbook():
-    if Dryrun:
-        return
-
     ansible_cmd = 'ansible-playbook -i {inventory} {playbook}'.format(
         inventory=conf['ansible']['inventory'],
-        playbook=conf['ansible']['group_user_playbook']
+        playbook=conf['ansible']['todo']
     )
+    logger.info(ansible_cmd)
+    if Dryrun:
+        return
     ret = subprocess.call(ansible_cmd, shell=True)
     logger.debug(ret)
 
 
-def get_presence_and_yaml_diff():
-    presence = conf['presence_role']
-    definition = conf['role']
-    diff = {
-        'group': [], 
-        'user': {}
-    }
-    for pk, pv in presence.items():
-        if definition.get(pk) is None:
-            diff['group'].append(pk)
-            diff['user'][pk] = pv
-        else:
-            diff['user'][pk] = {}
-            diff['user'][pk]['user'] = set(pv['user']) - set(definition[pk]['user'])
-    conf['diff_del'] = diff
-    logger.debug(diff)
+def set_role_hdfs_workspace():
+    cmds = []
+    credential = conf['hdfs']['credential']
+    kinit_hdfs_cmd = 'kinit -k -t {keytab} {principle}'.format(credential['super'], credential['keytab'])
+    cmds.append(kinit_hdfs_cmd)
+    for name, r in conf['role']:
+        cmds.append('hdfs dfs -mkdir -p {directory}'.format(r['hdfs_workspace']))
+        cmds.append('hdfs dfs -chgrp -R {group} {directory}'.format(name, r['hdfs_workspace']))
+        cmds.append('hdfs dfs -chmod -R g+w {directory}'.format(r['hdfs_workspace']))
+
+    Utility.mkdir(conf['hdfs']['todo'])
+    sh = conf['hdfs']['todo']
+    f = open(sh, 'w')
+    f.write('\n'.join(cmds))
+    f.close()
+    if Dryrun:
+        return
+    subprocess.call('bash %s' % sh, shell=True)
 
 
 def operate_principle():
@@ -180,7 +219,8 @@ def operate_principle():
             vars['username'] = u
             cmds += delprinc_tpl.format(**vars) + '\n'
 
-    sh = '{}/add.or.del.principle.sh'.format(conf['kerberos']['output_to'])
+    Utility.mkdir(conf['kerberos']['todo'])
+    sh = conf['kerberos']['todo']
     with open(sh, 'w') as f:
         f.write(cmds)
 
@@ -189,18 +229,6 @@ def operate_principle():
     ret = subprocess.call('bash {}'.format(sh), shell=True)
     logger.info(ret)
 
-
-def get_node_user_group():
-    result = subprocess.check_output("grep g_ /etc/group | awk -F: '{print $1}'", shell=True)
-    groups = result.decode().split('\n')[0:-1]
-    group_users = {}
-    for g in groups:
-        group_users[g] = {}
-        result = subprocess.check_output('lid -n -g {}'.format(g), shell=True)
-        users = result.decode().split('\n')[0:-1]
-        group_users[g]['user'] = list(map(lambda x: re.sub('^\s+', '', x), users))
-    
-    conf['presence_role'] = group_users
 
 def distribute_keytab():
     info = conf['mail']
@@ -226,6 +254,7 @@ def distribute_keytab():
         if Dryrun:
             continue
         mailer.send([mail['to']], mail)
+        time.sleep(3)
 
 
 def main():
@@ -233,25 +262,28 @@ def main():
     init_logger()
     get_conf()
 
-    logger.info('get valid ldap group users ... ')
+    logger.info('get valid ldap group users ...')
     bind_ldap()
     get_ldap_users()
     unbind_ldap()
 
-    logger.info('get cluster presence group and user information ... ')
+    logger.info('get cluster presence group and user information ...')
     get_node_user_group()
     get_presence_and_yaml_diff()
 
-    logger.info('generate user/group playbook ... ')
+    logger.info('generate user/group playbook ...')
     generate_group_user_directory_playbook()
 
     logger.info('run playbook ... ')
     play_group_user_playbook()
 
-    logger.info('operate kerberos principle ... ')
+    logger.info('operate role hdfs directory ...')
+    set_role_hdfs_workspace()
+
+    logger.info('operate kerberos principle ...')
     operate_principle()
 
-    logger.info('distribute user keytab ... ')
+    logger.info('distribute user keytab ...')
     distribute_keytab()
 
 

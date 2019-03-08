@@ -26,14 +26,14 @@ class Mailer():
         self.username = username or self.username
         self.password = password or self.password
 
-        self._connect()
+        self.connect()
 
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self._disconnect()
+        self.disconnect()
 
 
-    def _connect(self):
+    def connect(self):
         smtp = smtplib.SMTP()
         smtp.connect(self.server)
         smtp.ehlo()
@@ -43,7 +43,7 @@ class Mailer():
         self.smtp = smtp
 
 
-    def _disconnect(self):
+    def disconnect(self):
         self.smtp.quit()
 
 

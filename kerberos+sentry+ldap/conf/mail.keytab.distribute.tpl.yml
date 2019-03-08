@@ -12,6 +12,5 @@ Attached is the keytab file of your kerberos principle {{ name }}@{{ kerberos_re
 DO NOT REPLY THIS EMAIL!\n
 
 
-
 Thanks,\n
 CDH.admin"
