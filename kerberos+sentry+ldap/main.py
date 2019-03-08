@@ -2,6 +2,7 @@
 # coding: utf-8
 #
 
+from __future__ import absolute_import
 from ruamel.yaml import YAML
 import ldap
 import re
@@ -17,17 +18,17 @@ from util.utility import Utility
 
 Dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
 
-logger: object
+logger: logging.Logger
 conf: dict
 l: int
 util = Utility()
-yml_vars = {'cwd': os.path.dirname(sys.argv[0])}
+tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
 
 
 def init_logger():
     global logger
     logging_config: dict
-    with open('{cwd}/conf/logging.yml'.format(**yml_vars), 'r') as f:
+    with open('{cwd}/conf/logging.yml'.format(**tpl_vars), 'r') as f:
         logging_config = YAML().load(f)
     dictConfig(logging_config)
     logger = logging.getLogger()
@@ -35,9 +36,9 @@ def init_logger():
 
 def get_conf():
     global conf, l
-    with open('{cwd}/conf/security.cdh.yml'.format(**yml_vars), 'r') as f:
+    with open('{cwd}/conf/security.cdh.yml'.format(**tpl_vars), 'r') as f:
         template = Template(f.read())
-        conf = YAML().load(template.render(**yml_vars))
+        conf = YAML().load(template.render(**tpl_vars))
 
 
 def bind_ldap():
@@ -238,13 +239,13 @@ def distribute_keytab():
         for username in r['user']:
             user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['keytab_output_to'], username)
 
-    f_tpl = open('{cwd}/conf/mail.keytab.distribute.tpl.yml'.format(**yml_vars), 'r')
+    f_tpl = open('{cwd}/conf/mail.keytab.distribute.tpl.yml'.format(**tpl_vars), 'r')
     tpl = f_tpl.read()
     f_tpl.close()
     for username, keytab in user_keytab.items():
-        yml_vars['name'] = username
-        yml_vars['kerberos_realm'] = conf['kerberos']['realm']
-        mail = YAML().load(Template(tpl).render(**yml_vars))
+        tpl_vars['name'] = username
+        tpl_vars['kerberos_realm'] = conf['kerberos']['realm']
+        mail = YAML().load(Template(tpl).render(**tpl_vars))
         mail['to'] = '%s@yxt.com' % username
         mail['files'] = [keytab]
         logger.info('mail {}.keytab file to {} ...'.format(username, mail['to']))

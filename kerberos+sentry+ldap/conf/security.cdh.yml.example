@@ -11,26 +11,35 @@ ldap:
 
 role:
   g_dev:
-    user:
-    workspace: /wsdev
+    user: []
+    workspace: /ws.g_dev
+    hdfs_workspace: /ws.g_dev
   g_prod:
     user: [prodrt, prodol]
-    workspace: /wsprod
+    workspace: /ws.g_prod
+    hdfs_workspace: /ws.g_prod
 
 ansible:
   inventory: /etc/ansible/hosts
-  group_user_playbook: {{ cwd }}/output/ansible/group_user.playbook.yml
+  todo: {{ cwd }}/output/ansible/group_user.playbook.yml
   cdh_host_pattern: uydc
 
 kerberos:
   realm: UYDC.COM
   admin: root/admin
-  admin_pw: %pwd
-  output_to: {{ cwd }}/output/kerberos
+  admin_pw: Uydc.2910
+  keytab_output_to: {{ cwd }}/output/kerberos
+  todo: {{ cwd }}/output/kerberos/op_principle.sh
 
 mail:
   server: %server
   username: %username
   password: %pwd
   sender: %sender
+
+hdfs:
+  credential:
+    super: hdfs
+    keytab: {{ cwd }}/conf/hdfs.keytab
+  todo: {{ cwd }}/output/hdfs/op_hdfs.sh
 
