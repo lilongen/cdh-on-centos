@@ -21,6 +21,7 @@ Dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
 logger: object
 conf: dict
 l: int
+util = Utility()
 
 yml_vars = {
     'cwd': os.path.dirname(sys.argv[0])
@@ -135,7 +136,7 @@ def generate_group_user_directory_playbook():
                     'name': u,
                     'state': 'present',
                     'group': r_name,
-                    'home': '{worksapce}/{user}'.format(r['workspace'], u)
+                    'home': '{workspace}/{user}'.format(workspace=r['workspace'], user=u)
                 }
             })
             
@@ -165,7 +166,7 @@ def generate_group_user_directory_playbook():
         'user': 'root',
         'tasks': tasks
     }]
-    Utility.mkdir(conf['ansible']['todo'])
+    util.mkdir(conf['ansible']['todo'])
     with open(conf['ansible']['todo'], 'w') as f:
         YAML().dump(playbook, f)
 
@@ -185,17 +186,17 @@ def play_group_user_playbook():
 def set_role_hdfs_workspace():
     cmds = []
     credential = conf['hdfs']['credential']
-    kinit_hdfs_cmd = 'kinit -k -t {keytab} {principle}'.format(credential['super'], credential['keytab'])
+    kinit_hdfs_cmd = 'kinit -k -t {keytab} {principle}'.format(principle=credential['super'], keytab=credential['keytab'])
     cmds.append(kinit_hdfs_cmd)
-    for name, r in conf['role']:
-        cmds.append('hdfs dfs -mkdir -p {directory}'.format(r['hdfs_workspace']))
-        cmds.append('hdfs dfs -chgrp -R {group} {directory}'.format(name, r['hdfs_workspace']))
-        cmds.append('hdfs dfs -chmod -R g+w {directory}'.format(r['hdfs_workspace']))
+    for name, r in conf['role'].items():
+        cmds.append('hdfs dfs -mkdir -p {}'.format(r['hdfs_workspace']))
+        cmds.append('hdfs dfs -chgrp -R {} {}'.format(name, r['hdfs_workspace']))
+        cmds.append('hdfs dfs -chmod -R g+w {}'.format(r['hdfs_workspace']))
 
-    Utility.mkdir(conf['hdfs']['todo'])
+    util.mkdir(conf['hdfs']['todo'])
     sh = conf['hdfs']['todo']
     f = open(sh, 'w')
-    f.write('\n'.join(cmds))
+    f.write('\n'.join(cmds) + '\n')
     f.close()
     if Dryrun:
         return
@@ -205,7 +206,7 @@ def set_role_hdfs_workspace():
 def operate_principle():
     kadmin_with_credential = 'kadmin -p {admin} -w {admin_pw} '
     addprinc_tpl = kadmin_with_credential + 'addprinc -pw lle {username}'
-    ktadd_tpl = kadmin_with_credential + 'ktadd -k {output_to}/{username}.keytab {username}'
+    ktadd_tpl = kadmin_with_credential + 'ktadd -k {keytab_output_to}/{username}.keytab {username}'
     delprinc_tpl = kadmin_with_credential + 'delprinc -force {username}'
     cmds = ''
     vars = conf['kerberos']
@@ -219,7 +220,7 @@ def operate_principle():
             vars['username'] = u
             cmds += delprinc_tpl.format(**vars) + '\n'
 
-    Utility.mkdir(conf['kerberos']['todo'])
+    util.mkdir(conf['kerberos']['todo'])
     sh = conf['kerberos']['todo']
     with open(sh, 'w') as f:
         f.write(cmds)
@@ -239,7 +240,7 @@ def distribute_keytab():
     user_keytab = {}
     for r_name, r in conf['role'].items():
         for username in r['user']:
-            user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['output_to'], username)
+            user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['keytab_output_to'], username)
 
     f_tpl = open('{cwd}/conf/mail.keytab.distribute.tpl.yml'.format(**yml_vars), 'r')
     tpl = f_tpl.read()
