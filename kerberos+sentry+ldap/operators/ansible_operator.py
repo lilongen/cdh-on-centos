@@ -78,7 +78,7 @@ class AnsibleOperator(BaseOperator):
             'user': 'root',
             'tasks': tasks
         }]
-        util.mkdir(conf['ansible']['todo'])
+        util.mkdir_p(conf['ansible']['todo'])
         with open(conf['ansible']['todo'], 'w') as f:
             YAML().dump(playbook, f)
 

@@ -162,7 +162,7 @@ def generate_group_user_directory_playbook():
         'user': 'root',
         'tasks': tasks
     }]
-    util.mkdir(conf['ansible']['todo'])
+    util.mkdir_p(conf['ansible']['todo'])
     with open(conf['ansible']['todo'], 'w') as f:
         YAML().dump(playbook, f)
 
@@ -189,7 +189,7 @@ def set_role_hdfs_workspace():
         cmds.append('hdfs dfs -chgrp -R {} {}'.format(name, r['hdfs_workspace']))
         cmds.append('hdfs dfs -chmod -R g+w {}'.format(r['hdfs_workspace']))
 
-    util.mkdir(conf['hdfs']['todo'])
+    util.mkdir_p(conf['hdfs']['todo'])
     sh = conf['hdfs']['todo']
     f = open(sh, 'w')
     f.write('\n'.join(cmds) + '\n')
@@ -216,7 +216,7 @@ def operate_principle():
             vars['username'] = u
             cmds += delprinc_tpl.format(**vars) + '\n'
 
-    util.mkdir(conf['kerberos']['todo'])
+    util.mkdir_p(conf['kerberos']['todo'])
     sh = conf['kerberos']['todo']
     with open(sh, 'w') as f:
         f.write(cmds)

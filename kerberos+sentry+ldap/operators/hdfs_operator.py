@@ -29,7 +29,7 @@ class HdfsOperator(BaseOperator):
             cmds.append('hdfs dfs -chgrp -R {} {}'.format(name, r['hdfs_workspace']))
             cmds.append('hdfs dfs -chmod -R g+w {}'.format(r['hdfs_workspace']))
 
-        util.mkdir(conf['hdfs']['todo'])
+        util.mkdir_p(conf['hdfs']['todo'])
         sh = conf['hdfs']['todo']
         f = open(sh, 'w')
         f.write('\n'.join(cmds) + '\n')

@@ -35,7 +35,7 @@ class KerberosOperator(BaseOperator):
                 vars['username'] = u
                 cmds += delprinc_tpl.format(**vars) + '\n'
 
-        util.mkdir(conf['kerberos']['todo'])
+        util.mkdir_p(conf['kerberos']['todo'])
         sh = conf['kerberos']['todo']
         with open(sh, 'w') as f:
             f.write(cmds)

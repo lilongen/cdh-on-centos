@@ -3,7 +3,7 @@ import errno
 
 class Utility():
 
-    def mkdir(self, filename):
+    def mkdir_p(self, filename):
         if os.path.exists(os.path.dirname(filename)):
             return
 
