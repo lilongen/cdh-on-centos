@@ -3,16 +3,15 @@
 from abc import ABCMeta, abstractmethod
 
 
-class BaseOperator(object):
-    __metaclass__ = ABCMeta
+class BaseOperator(object, metaclass=ABCMeta):
 
     @property
     def name(self):
-        """
-        :return: the operators name
-        :rtype: unicode
-        """
         raise NotImplementedError()
+
+    @abstractmethod
+    def __init__(self, **kwargs):
+        self.var = kwargs
 
     @abstractmethod
     def execute(self):

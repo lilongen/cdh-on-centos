@@ -7,12 +7,8 @@ from .base_operator import BaseOperator
 
 class PrepareOperator(BaseOperator):
 
-    def __init__(self, dryrun, logger, conf, util, tpl_vars):
-        self.dryrun = dryrun
-        self.logger = logger
-        self.conf = conf
-        self.util = util
-        self.tpl_vars = tpl_vars
+    def __init__(self, **kwargs):
+        super(PrepareOperator, self).__init__(**kwargs)
         self.l: int
 
     def execute(self):
@@ -24,7 +20,9 @@ class PrepareOperator(BaseOperator):
 
 
     def bind_ldap(self):
-        (dryrun, logger, conf, util, tpl_vars) = (self.dryrun, self.logger, self.conf, self.util, self.tpl_vars)
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
         ldap_conf = conf['ldap']
         l = ldap.initialize(ldap_conf['url'])
         l.simple_bind_s(ldap_conf['bind_dn'], ldap_conf['bind_pw'])
@@ -32,12 +30,14 @@ class PrepareOperator(BaseOperator):
 
 
     def unbind_ldap(self):
-        (logger, conf, util, tpl_vars) = (self.logger, self.conf, self.util, self.tpl_vars)
         self.l.unbind_s()
 
 
     def get_ldap_users(self):
-        (logger, conf, util, tpl_vars) = (self.logger, self.conf, self.util, self.tpl_vars)
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
+        logger.info('get AD/ldap group users ...')
         l = self.l
         ldap_conf = conf['ldap']
         re_1st_ou = re.compile(r'CN=[^,]+,OU=([^,]+),')
@@ -60,7 +60,9 @@ class PrepareOperator(BaseOperator):
 
 
     def get_node_user_group(self):
-        (logger, conf, util, tpl_vars) = (self.logger, self.conf, self.util, self.tpl_vars)
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
         result = subprocess.check_output("grep g_ /etc/group | awk -F: '{print $1}'", shell=True)
         groups = result.decode().split('\n')[0:-1]
         group_users = {}
@@ -74,7 +76,9 @@ class PrepareOperator(BaseOperator):
 
 
     def get_presence_and_yaml_diff(self):
-        (logger, conf, util, tpl_vars) = (self.logger, self.conf, self.util, self.tpl_vars)
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
         presence = conf['presence_role']
         definition = conf['role']
         diff = {

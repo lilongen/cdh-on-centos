@@ -7,12 +7,8 @@ from .base_operator import BaseOperator
 
 class AnsibleOperator(BaseOperator):
 
-    def __init__(self, dryrun, logger, conf, util, tpl_vars):
-        self.dryrun = dryrun
-        self.logger = logger
-        self.conf = conf
-        self.util = util
-        self.tpl_vars = tpl_vars
+    def __init__(self, **kwargs):
+        super(AnsibleOperator, self).__init__(**kwargs)
 
     def execute(self):
         self.generate_group_user_directory_playbook()
@@ -20,7 +16,9 @@ class AnsibleOperator(BaseOperator):
 
 
     def generate_group_user_directory_playbook(self):
-        (dryrun, logger, conf, util, tpl_vars) = (self.dryrun, self.logger, self.conf, self.util, self.tpl_vars)
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
         tasks = []
         # generate new part
         for r_name, r in conf['role'].items():
@@ -84,7 +82,9 @@ class AnsibleOperator(BaseOperator):
 
 
     def play_group_user_playbook(self):
-        (dryrun, logger, conf, util, tpl_vars) = (self.dryrun, self.logger, self.conf, self.util, self.tpl_vars)
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
         ansible_cmd = 'ansible-playbook -i {inventory} {playbook}'.format(
             inventory=conf['ansible']['inventory'],
             playbook=conf['ansible']['todo']

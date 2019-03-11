@@ -27,7 +27,7 @@ ansible:
 kerberos:
   realm: UYDC.COM
   admin: root/admin
-  admin_pw: Uydc.2910
+  admin_pw: %pwd
   keytab_output_to: {{ cwd }}/output/kerberos
   todo: {{ cwd }}/output/kerberos/op_principle.sh
 

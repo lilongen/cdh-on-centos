@@ -8,20 +8,17 @@ from .base_operator import BaseOperator
 
 class DistributeKeytabOperator(BaseOperator):
 
-    def __init__(self, dryrun, logger, conf, util, tpl_vars):
-        self.dryrun = dryrun
-        self.logger = logger
-        self.conf = conf
-        self.util = util
-        self.tpl_vars = tpl_vars
-
+    def __init__(self, **kwargs):
+        super(DistributeKeytabOperator, self).__init__(**kwargs)
 
     def execute(self):
         self.distribute_keytab()
 
 
     def distribute_keytab(self):
-        (dryrun, logger, conf, util, tpl_vars) = (self.dryrun, self.logger, self.conf, self.util, self.tpl_vars)
+        var = self.var
+
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
         info = conf['mail']
         mailer = Mailer(server=info['server'],
                         sender=info['sender'],

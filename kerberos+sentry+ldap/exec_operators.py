@@ -47,13 +47,21 @@ def main():
     print('init app ...')
     init_logger()
     get_conf()
-    PrepareOperator(dryrun, logger, conf, util, tpl_vars).execute()
-    AnsibleOperator(dryrun, logger, conf, util, tpl_vars).execute()
-    HdfsOperator(dryrun, logger, conf, util, tpl_vars).execute()
-    KerberosOperator(dryrun, logger, conf, util, tpl_vars).execute()
-    DistributeKeytabOperator(dryrun, logger, conf, util, tpl_vars).execute()
 
-    logger.info('get AD/ldap group users ...')
+    operator_var = {
+        'dryrun': dryrun,
+        'logger': logger,
+        'conf': conf,
+        'util': util,
+        'tpl_vars': tpl_vars
+    }
+
+    PrepareOperator(**operator_var).execute()
+    AnsibleOperator(**operator_var).execute()
+    HdfsOperator(**operator_var).execute()
+    KerberosOperator(**operator_var).execute()
+    DistributeKeytabOperator(**operator_var).execute()
+
 
 
 if __name__ == "__main__":
