@@ -10,8 +10,16 @@ class AnsibleOperator(BaseOperator):
     def __init__(self, **kwargs):
         super(AnsibleOperator, self).__init__(**kwargs)
 
+
     def execute(self):
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
+        logger.info('AnsibleOperator ...')
+        logger.info('generate group, user, directory playbook ...')
         self.generate_group_user_directory_playbook()
+
+        logger.info('play group, user, directory playbook ...')
         self.play_group_user_playbook()
 
 

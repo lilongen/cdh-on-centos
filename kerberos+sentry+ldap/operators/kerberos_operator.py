@@ -10,6 +10,11 @@ class KerberosOperator(BaseOperator):
 
 
     def execute(self):
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
+        logger.info('KerberosOperator ...')
+        logger.info('operate principle and generate keytab ...')
         self.operate_principle()
 
 

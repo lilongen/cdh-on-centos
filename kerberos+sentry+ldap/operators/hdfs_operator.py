@@ -11,6 +11,11 @@ class HdfsOperator(BaseOperator):
 
 
     def execute(self):
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
+        logger.info('HdfsOperator ...')
+        logger.info('set gorup/user directory hdfs permission ...')
         self.set_role_hdfs_workspace()
 
 

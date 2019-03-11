@@ -11,14 +11,20 @@ class DistributeKeytabOperator(BaseOperator):
     def __init__(self, **kwargs):
         super(DistributeKeytabOperator, self).__init__(**kwargs)
 
+
     def execute(self):
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
+        logger.info('DistributeKeytabOperator ...')
+        logger.info('distribute priciple keytab ...')
         self.distribute_keytab()
 
 
     def distribute_keytab(self):
         var = self.var
-
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
         info = conf['mail']
         mailer = Mailer(server=info['server'],
                         sender=info['sender'],

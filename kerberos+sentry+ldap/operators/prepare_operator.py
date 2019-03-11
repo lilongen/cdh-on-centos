@@ -11,11 +11,21 @@ class PrepareOperator(BaseOperator):
         super(PrepareOperator, self).__init__(**kwargs)
         self.l: int
 
+
     def execute(self):
+        var = self.var
+        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
+
+        logger.info('PrepareOperator ...')
+        logger.info('get valid AD user in specail group ...')
         self.bind_ldap()
         self.get_ldap_users()
         self.unbind_ldap()
+
+        logger.info('get cluster host precense user and group info ...')
         self.get_node_user_group()
+
+        logger.info('get diff between valid AD user and precense info  ...')
         self.get_presence_and_yaml_diff()
 
 
