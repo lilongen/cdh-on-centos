@@ -2,7 +2,6 @@
 # coding: utf-8
 #
 
-from __future__ import absolute_import
 from ruamel.yaml import YAML
 import sys
 import os
@@ -17,6 +16,7 @@ from operators.kerberos_operator import KerberosOperator
 from operators.distribute_keytab_operator import DistributeKeytabOperator
 
 
+dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
 dryrun = True
 
 logger: logging.Logger
