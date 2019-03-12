@@ -79,3 +79,4 @@ class Mailer():
         for to in tolist:
             mail['to'] = to
             self.smtp.sendmail(self.sender, to, self.assemble(mail).as_string())
+

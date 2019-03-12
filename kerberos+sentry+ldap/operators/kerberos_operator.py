@@ -45,5 +45,6 @@ class KerberosOperator(BaseOperator):
 
         if dryrun:
             return
+
         ret = subprocess.call('bash {}'.format(sh), shell=True)
         logger.info(ret)

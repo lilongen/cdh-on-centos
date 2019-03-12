@@ -2,12 +2,14 @@
 # coding: utf-8
 #
 
-from ruamel.yaml import YAML
 import sys
 import os
 import logging
+
+from ruamel.yaml import YAML
 from jinja2 import Template
 from logging.config import dictConfig
+
 from util.utility import Utility
 from operators.prepare_operator import PrepareOperator
 from operators.ansible_operator import AnsibleOperator
@@ -21,14 +23,12 @@ dryrun = True
 
 logger: logging.Logger
 conf: dict
-l: int
 util = Utility()
 tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
 
 
 def init_logger():
     global logger
-    logging_config: dict
     with open('{cwd}/conf/logging.yml'.format(**tpl_vars), 'r') as f:
         logging_config = YAML().load(f)
     dictConfig(logging_config)
@@ -36,10 +36,10 @@ def init_logger():
 
 
 def get_conf():
-    global conf, l
+    global conf
     with open('{cwd}/conf/security.cdh.yml'.format(**tpl_vars), 'r') as f:
         template = Template(f.read())
-        conf = YAML().load(template.render(**tpl_vars))
+    conf = YAML().load(template.render(**tpl_vars))
 
 
 

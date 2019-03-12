@@ -34,9 +34,8 @@ class HdfsOperator(BaseOperator):
 
         util.mkdir_p(conf['hdfs']['todo'])
         sh = conf['hdfs']['todo']
-        f = open(sh, 'w')
-        f.write('\n'.join(cmds) + '\n')
-        f.close()
+        with open(sh, 'w') as f:
+            f.write('\n'.join(cmds) + '\n')
         if dryrun:
             return
         subprocess.call('bash %s' % sh, shell=True)

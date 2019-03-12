@@ -2,15 +2,17 @@
 # coding: utf-8
 #
 
-from ruamel.yaml import YAML
 import ldap
 import re
 import subprocess
 import sys
 import os
 import logging
+
+from ruamel.yaml import YAML
 from jinja2 import Template
 from logging.config import dictConfig
+
 from util.mailer import Mailer
 from util.utility import Utility
 
