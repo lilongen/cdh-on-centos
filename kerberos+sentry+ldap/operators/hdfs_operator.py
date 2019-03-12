@@ -25,10 +25,10 @@ class HdfsOperator(BaseOperator):
         credential = conf['hdfs']['credential']
         kinit_hdfs_cmd = 'kinit -k -t {keytab} {principle}'.format(principle=credential['super'], keytab=credential['keytab'])
         cmds.append(kinit_hdfs_cmd)
-        for name, r in conf['role'].items():
-            cmds.append('hdfs dfs -mkdir -p {}'.format(r['hdfs_workspace']))
-            cmds.append('hdfs dfs -chgrp -R {} {}'.format(name, r['hdfs_workspace']))
-            cmds.append('hdfs dfs -chmod -R g+w {}'.format(r['hdfs_workspace']))
+        for g_name, g in conf['group'].items():
+            cmds.append('hdfs dfs -mkdir -p {}'.format(g['hdfs_workspace']))
+            cmds.append('hdfs dfs -chgrp -R {} {}'.format(g_name, g['hdfs_workspace']))
+            cmds.append('hdfs dfs -chmod -R g+w {}'.format(g['hdfs_workspace']))
 
         util.mkdir_p(conf['hdfs']['todo'])
         sh = conf['hdfs']['todo']

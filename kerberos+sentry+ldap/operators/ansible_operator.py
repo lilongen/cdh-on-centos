@@ -27,46 +27,46 @@ class AnsibleOperator(BaseOperator):
 
         tasks = []
         # generate new part
-        for r_name, r in conf['role'].items():
+        for g_name, g in conf['group'].items():
             tasks.append({
-                'name': 'Ensure group "{}" exists'.format(r_name),
+                'name': 'Ensure group "{}" exists'.format(g_name),
                 'group': {
-                    'name': r_name,
+                    'name': g_name,
                     'state': 'present'
                 }
             })
             tasks.append({
-                'name': 'Ensure directory "{}" exists'.format(r['workspace']),
+                'name': 'Ensure directory "{}" exists'.format(g['workspace']),
                 'file': {
-                    'path': r['workspace'],
+                    'path': g['workspace'],
                     'state': 'directory',
                     'mode': '0755',
-                    'group': r_name,
+                    'group': g_name,
                 }
             })
 
-            for u in r['user']:
+            for u in g['user']:
                 tasks.append({
-                    'name': 'Ensure user "{}" exist, and belong to group "{}'"".format(u, r_name),
+                    'name': 'Ensure user "{}" exist, and belong to group "{}'"".format(u, g_name),
                     'user': {
                         'name': u,
                         'state': 'present',
-                        'group': r_name,
-                        'home': '{workspace}/{user}'.format(workspace=r['workspace'], user=u)
+                        'group': g_name,
+                        'home': '{workspace}/{user}'.format(workspace=g['workspace'], user=u)
                     }
                 })
 
         # generate deleted part
-        for r_name in conf['diff_del']['group']:
+        for g_name in conf['diff_del']['group']:
             tasks.append({
-                'name': 'Delete group "{}"'.format(r_name),
+                'name': 'Delete group "{}"'.format(g_name),
                 'group': {
-                    'name': r_name,
+                    'name': g_name,
                     'state': 'absent'
                 }
             })
-        for r_name, r in conf['diff_del']['user'].items():
-            for u in r['user']:
+        for g_name, g in conf['diff_del']['user'].items():
+            for u in g['user']:
                 tasks.append({
                     'name': 'Delete user "{}" '.format(u),
                     'user': {

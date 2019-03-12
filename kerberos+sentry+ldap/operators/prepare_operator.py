@@ -63,7 +63,7 @@ class PrepareOperator(BaseOperator):
             user_id = entry[0][1]['sAMAccountName'][0].decode()
             user_1stou = re.match(re_1st_ou, user_dn).group(1)
             user_ids.append(user_id)
-        conf['role']['g_dev']['user'] = user_ids
+        conf['group']['g_dev']['user'] = user_ids
 
     def get_node_user_group(self):
         var = self.var
@@ -85,7 +85,7 @@ class PrepareOperator(BaseOperator):
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
 
         presence = conf['presence_role']
-        definition = conf['role']
+        definition = conf['group']
         diff = {
             'group': [],
             'user': {}

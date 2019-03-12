@@ -27,13 +27,13 @@ class KerberosOperator(BaseOperator):
         delprinc_tpl = kadmin_with_credential + 'delprinc -force {username}'
         cmds = ''
         vars = conf['kerberos']
-        for r_name, r in conf['role'].items():
-            for u in r['user']:
+        for g_name, g in conf['group'].items():
+            for u in g['user']:
                 vars['username'] = u
                 cmds += addprinc_tpl.format(**vars) + '\n'
                 cmds += ktadd_tpl.format(**vars) + '\n'
-        for r_name, r in conf['diff_del']['user'].items():
-            for u in r['user']:
+        for g_name, g in conf['diff_del']['user'].items():
+            for u in g['user']:
                 vars['username'] = u
                 cmds += delprinc_tpl.format(**vars) + '\n'
 

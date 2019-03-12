@@ -72,7 +72,7 @@ def get_ldap_users():
         user_id = entry[0][1]['sAMAccountName'][0].decode()
         user_1stou = re.match(re_1st_ou, user_dn).group(1)
         user_ids.append(user_id)
-    conf['role']['g_dev']['user'] = user_ids
+    conf['group']['g_dev']['user'] = user_ids
 
 
 def get_node_user_group():
@@ -90,7 +90,7 @@ def get_node_user_group():
 
 def get_presence_and_yaml_diff():
     presence = conf['presence_role']
-    definition = conf['role']
+    definition = conf['group']
     diff = {
         'group': [],
         'user': {}
@@ -109,7 +109,7 @@ def get_presence_and_yaml_diff():
 def generate_group_user_directory_playbook():
     tasks = []
     #generate new part
-    for r_name, r in conf['role'].items():
+    for r_name, r in conf['group'].items():
         tasks.append({
             'name': 'Ensure group "{}" exists'.format(r_name),
             'group': {
@@ -186,7 +186,7 @@ def set_role_hdfs_workspace():
     credential = conf['hdfs']['credential']
     kinit_hdfs_cmd = 'kinit -k -t {keytab} {principle}'.format(principle=credential['super'], keytab=credential['keytab'])
     cmds.append(kinit_hdfs_cmd)
-    for name, r in conf['role'].items():
+    for name, r in conf['group'].items():
         cmds.append('hdfs dfs -mkdir -p {}'.format(r['hdfs_workspace']))
         cmds.append('hdfs dfs -chgrp -R {} {}'.format(name, r['hdfs_workspace']))
         cmds.append('hdfs dfs -chmod -R g+w {}'.format(r['hdfs_workspace']))
@@ -208,7 +208,7 @@ def operate_principle():
     delprinc_tpl = kadmin_with_credential + 'delprinc -force {username}'
     cmds = ''
     vars = conf['kerberos']
-    for r_name, r in conf['role'].items():
+    for r_name, r in conf['group'].items():
         for u in r['user']:
             vars['username'] = u
             cmds += addprinc_tpl.format(**vars) + '\n'
@@ -236,7 +236,7 @@ def distribute_keytab():
                     username=info['username'],
                     password=info['password'])
     user_keytab = {}
-    for r_name, r in conf['role'].items():
+    for r_name, r in conf['group'].items():
         for username in r['user']:
             user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['keytab_output_to'], username)
 
