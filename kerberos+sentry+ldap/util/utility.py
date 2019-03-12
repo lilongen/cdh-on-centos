@@ -4,7 +4,8 @@ import errno
 
 class Utility():
 
-    def mkdir_p(self, filename):
+    @staticmethod
+    def mkdir_p(filename):
         if os.path.exists(os.path.dirname(filename)):
             return
 

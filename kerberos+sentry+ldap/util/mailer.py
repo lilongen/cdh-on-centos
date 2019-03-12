@@ -46,14 +46,13 @@ class Mailer(object):
 
     def _append_attach(self, mail, files):
         for file in files:
-            print(file)
             f = open(file, 'rb')
             attach = MIMEApplication(f.read())
+            f.close()
             attach.add_header('Content-Disposition',
                               'attachment',
                               filename=('utf-8', '', file.split('/')[-1]))
             mail.attach(attach)
-            f.close()
 
     def assemble(self, mail: dict):
         mime = MIMEMultipart()  # 中文需参数‘utf-8’，单字节字符不需要
