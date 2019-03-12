@@ -3,11 +3,11 @@
 import subprocess
 from .base_operator import BaseOperator
 
+
 class KerberosOperator(BaseOperator):
 
     def __init__(self, **kwargs):
         super(KerberosOperator, self).__init__(**kwargs)
-
 
     def execute(self):
         var = self.var
@@ -16,7 +16,6 @@ class KerberosOperator(BaseOperator):
         logger.info('KerberosOperator ...')
         logger.info('operate principle and generate keytab ...')
         self.operate_principle()
-
 
     def operate_principle(self):
         var = self.var

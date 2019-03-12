@@ -10,7 +10,6 @@ class AnsibleOperator(BaseOperator):
     def __init__(self, **kwargs):
         super(AnsibleOperator, self).__init__(**kwargs)
 
-
     def execute(self):
         var = self.var
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
@@ -21,7 +20,6 @@ class AnsibleOperator(BaseOperator):
 
         logger.info('play group, user, directory playbook ...')
         self.play_group_user_playbook()
-
 
     def generate_group_user_directory_playbook(self):
         var = self.var
@@ -87,7 +85,6 @@ class AnsibleOperator(BaseOperator):
         util.mkdir_p(conf['ansible']['todo'])
         with open(conf['ansible']['todo'], 'w') as f:
             YAML().dump(playbook, f)
-
 
     def play_group_user_playbook(self):
         var = self.var

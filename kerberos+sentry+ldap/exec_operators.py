@@ -42,7 +42,6 @@ def get_conf():
     conf = YAML().load(template.render(**tpl_vars))
 
 
-
 def main():
     print('init app ...')
     init_logger()
@@ -61,7 +60,6 @@ def main():
     HdfsOperator(**operator_var).execute()
     KerberosOperator(**operator_var).execute()
     DistributeKeytabOperator(**operator_var).execute()
-
 
 
 if __name__ == "__main__":

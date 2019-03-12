@@ -1,6 +1,7 @@
 import os
 import errno
 
+
 class Utility():
 
     def mkdir_p(self, filename):
@@ -12,7 +13,6 @@ class Utility():
         except OSError as e:  # Guard against race condition
             if e.errno != errno.EEXIST:
                 raise
-
 
     def abc(self):
         pass

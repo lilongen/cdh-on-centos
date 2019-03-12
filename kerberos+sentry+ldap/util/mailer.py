@@ -5,20 +5,21 @@
 #   cause python3.7 openssl changes, smtp = smtplib.SMTP().starttls() will failed
 #   so this mailer does not work at python3.7
 #
-
 import smtplib
 from email.header import Header
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from ruamel.yaml import YAML
+from jinja2 import Template
 
-class Mailer():
+
+class Mailer(object):
     server = 'mail.yxt.com:587'
     sender = 'jenkins@yxt.com'
     username = 'jenkins'
     password = 'pwdasdwx'
-    smtp: object
-
+    smtp_cli: object
 
     def __init__(self, server=None, sender=None, username=None, password=None):
         self.server = server or self.server
@@ -28,24 +29,20 @@ class Mailer():
 
         self.connect()
 
-
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.disconnect()
 
-
     def connect(self):
-        smtp = smtplib.SMTP()
-        smtp.connect(self.server)
-        smtp.ehlo()
-        smtp.starttls() # does not work in py3.7
-        smtp.ehlo()
-        smtp.login(self.username, self.password)
-        self.smtp = smtp
-
+        smtp_cli = smtplib.SMTP()
+        smtp_cli.connect(self.server)
+        smtp_cli.ehlo()
+        smtp_cli.starttls() # does not work in py3.7
+        smtp_cli.ehlo()
+        smtp_cli.login(self.username, self.password)
+        self.smtp_cli = smtp_cli
 
     def disconnect(self):
-        self.smtp.quit()
-
+        self.smtp_cli.quit()
 
     def _append_attach(self, mail, files):
         for file in files:
@@ -58,7 +55,6 @@ class Mailer():
             mail.attach(attach)
             f.close()
 
-
     def assemble(self, mail: dict):
         mime = MIMEMultipart()  # 中文需参数‘utf-8’，单字节字符不需要
         puretext = MIMEText(mail['msg'], 'plain', 'utf-8')
@@ -66,7 +62,7 @@ class Mailer():
         mime['Subject'] = Header(mail['subject'], 'utf-8').encode()
         mime['To'] = mail['to']
         mime['From'] = self.sender
-        if mail.get('from') != None:
+        if mail.get('from') is not None:
             mime['From'] = mail['from']
 
         files = mail.get('files')
@@ -74,9 +70,13 @@ class Mailer():
             self._append_attach(mime, files)
         return mime
 
-
     def send(self, tolist: list, mail: dict):
         for to in tolist:
             mail['to'] = to
-            self.smtp.sendmail(self.sender, to, self.assemble(mail).as_string())
+            self.smtp_cli.sendmail(self.sender, to, self.assemble(mail).as_string())
 
+    def send_tpl(self, tolist, tpl_file, tpl_vars):
+        with open(tpl_file, 'r') as f_tpl:
+            tpl = f_tpl.read()
+        mail = YAML().load(Template(tpl).render(**tpl_vars))
+        self.send(tolist, mail)

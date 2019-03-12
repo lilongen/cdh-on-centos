@@ -5,12 +5,12 @@ import re
 import subprocess
 from .base_operator import BaseOperator
 
+
 class PrepareOperator(BaseOperator):
 
     def __init__(self, **kwargs):
         super(PrepareOperator, self).__init__(**kwargs)
         self.l: int
-
 
     def execute(self):
         var = self.var
@@ -28,7 +28,6 @@ class PrepareOperator(BaseOperator):
         logger.info('get diff between valid AD user and precense info  ...')
         self.get_presence_and_yaml_diff()
 
-
     def bind_ldap(self):
         var = self.var
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
@@ -38,10 +37,8 @@ class PrepareOperator(BaseOperator):
         l.simple_bind_s(ldap_conf['bind_dn'], ldap_conf['bind_pw'])
         self.l = l
 
-
     def unbind_ldap(self):
         self.l.unbind_s()
-
 
     def get_ldap_users(self):
         var = self.var
@@ -68,7 +65,6 @@ class PrepareOperator(BaseOperator):
             user_ids.append(user_id)
         conf['role']['g_dev']['user'] = user_ids
 
-
     def get_node_user_group(self):
         var = self.var
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
@@ -83,7 +79,6 @@ class PrepareOperator(BaseOperator):
             group_users[g]['user'] = list(map(lambda x: re.sub('^\s+', '', x), users))
 
         conf['presence_role'] = group_users
-
 
     def get_presence_and_yaml_diff(self):
         var = self.var

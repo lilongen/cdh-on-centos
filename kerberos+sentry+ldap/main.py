@@ -16,6 +16,7 @@ from logging.config import dictConfig
 from util.mailer import Mailer
 from util.utility import Utility
 
+
 dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
 
 logger: logging.Logger
