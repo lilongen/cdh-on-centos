@@ -24,17 +24,18 @@ class BaseOperator(object, metaclass=ABCMeta):
     def valid_kwargs(callable_):
         def wrapper(self, *args, **kwargs):
             if sorted(self.valid_keyword) != sorted(kwargs):
-                print('{}: init missing needed variables ...'.format(type(self)))
+                print('{}.__init__(): missing needed kwarg'.format(type(self)))
                 self.err = 1
             return callable_(self, *args, **kwargs)
         return wrapper
 
     def ignore_if_error(callable_):
         def wrapper(self, *args, **kwargs):
+            class_ = type(self)
             if self.err == 0:
                 return callable_(self, *args, **kwargs)
             else:
-                print('{}.err = {} operator.execute ignored ...'.format(self, self.err))
+                print('{cls}.err = {err}, \n{cls}.execute() ... ignored'.format(cls=class_, err=self.err))
                 return (lambda: None)()
         return wrapper
 
