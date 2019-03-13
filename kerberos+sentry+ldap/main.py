@@ -19,7 +19,6 @@ from operators.distribute_keytab_operator import DistributeKeytabOperator
 
 
 dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
-dryrun = True
 
 logger: logging.Logger
 conf: dict
@@ -55,11 +54,20 @@ def main():
         'tpl_vars': tpl_vars
     }
 
+    operator_var1 = {
+        'dryrun': dryrun,
+        'logger': logger,
+        'conf': conf,
+        'util': util,
+        'tpl_varsaaa': tpl_vars
+    }
+
+
     PrepareOperator(**operator_var).execute()
     AnsibleOperator(**operator_var).execute()
     HdfsOperator(**operator_var).execute()
-    KerberosOperator(**operator_var).execute()
-    DistributeKeytabOperator(**operator_var).execute()
+    KerberosOperator(**operator_var1).execute()
+    DistributeKeytabOperator(**operator_var1).execute()
 
 
 if __name__ == "__main__":

@@ -9,8 +9,9 @@ from .base_operator import BaseOperator
 class DistributeKeytabOperator(BaseOperator):
 
     def __init__(self, **kwargs):
-        super(DistributeKeytabOperator, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
+    @BaseOperator.ignore_if_error
     def execute(self):
         var = self.var
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
@@ -18,6 +19,7 @@ class DistributeKeytabOperator(BaseOperator):
         logger.info('DistributeKeytabOperator ...')
         logger.info('distribute priciple keytab ...')
         self.distribute_keytab()
+        return 0
 
     def distribute_keytab(self):
         var = self.var

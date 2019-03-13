@@ -9,7 +9,7 @@ ldap:
   filter: (&(objectCategory=person)(objectClass=user)(memberOf=cn=BDAI,OU=组,dc=domain,dc=oceansoft))
   attrs: [sAMAccountName, mail, mobile]
 
-role:
+group:
   g_dev:
     user: []
     workspace: /ws.g_dev
