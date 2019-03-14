@@ -10,7 +10,7 @@ class AnsibleOperator(BaseOperator):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    @BaseOperator.ignore_if_error
+    @BaseOperator.cancel_on_error
     def execute(self):
         var = self.var
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
