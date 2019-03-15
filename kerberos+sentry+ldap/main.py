@@ -46,19 +46,22 @@ def main():
     init_logger()
     get_conf()
 
-    operator_var = {
+    operator_kwargs = {
         'dryrun': dryrun,
         'logger': logger,
         'conf': conf,
         'util': util,
         'tpl_vars': tpl_vars
     }
-
-    PrepareOperator(**operator_var).execute()
-    AnsibleOperator(**operator_var).execute()
-    HdfsOperator(**operator_var).execute()
-    KerberosOperator(**operator_var).execute()
-    DistributeKeytabOperator(**operator_var).execute()
+    operators = (
+        'PrepareOperator',
+        'AnsibleOperator',
+        'HdfsOperator',
+        'KerberosOperator',
+        'DistributeKeytabOperator',
+    )
+    for name in operators:
+        globals()[name](**operator_kwargs).execute()
 
 
 if __name__ == "__main__":
