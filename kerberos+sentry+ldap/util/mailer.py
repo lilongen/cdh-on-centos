@@ -55,7 +55,7 @@ class Mailer(object):
             mail.attach(attach)
 
     def assemble(self, mail: dict):
-        mime = MIMEMultipart()  # 中文需参数‘utf-8’，单字节字符不需要
+        mime = MIMEMultipart()
         puretext = MIMEText(mail['msg'], 'plain', 'utf-8')
         mime.attach(puretext)
         mime['Subject'] = Header(mail['subject'], 'utf-8').encode()

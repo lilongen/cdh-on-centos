@@ -31,10 +31,10 @@ class BaseOperator(object, metaclass=ABCMeta):
 
     def cancel_if_error(callable_):
         def wrapper(self, *args, **kwargs):
-            class_ = type(self)
             if self.err == 0:
                 return callable_(self, *args, **kwargs)
             else:
+                class_ = type(self)
                 print('{cls}.err = {err}, \n{cls}.execute() ... ignored'.format(cls=class_, err=self.err))
                 return (lambda: None)()
         return wrapper
