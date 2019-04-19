@@ -6,18 +6,20 @@ ldap:
   bind_pw:  %pwd
   base_dn: OU=xxx,dc=domain,dc=oceansoft
 
-  filter: (&(objectCategory=person)(objectClass=user)(memberOf=cn=BDAI,OU=组,dc=domain,dc=oceansoft))
+  filter: (&(objectCategory=person)(objectClass=user)(memberOf=cn=BDAI,OU=组,dc=domain,dc=corporation_name))
   attrs: [sAMAccountName, mail, mobile]
 
 group:
   g_dev:
-    user: []
+    user: %user_list_in_above_ldap_filter
     workspace: /ws.g_dev
     hdfs_workspace: /ws.g_dev
+    hive_role: r_dev
   g_prod:
     user: [prodrt, prodol]
     workspace: /ws.g_prod
     hdfs_workspace: /ws.g_prod
+    hive_role: r_prod
 
 ansible:
   inventory: /etc/ansible/hosts
