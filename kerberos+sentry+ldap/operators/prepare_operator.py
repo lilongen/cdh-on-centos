@@ -10,7 +10,7 @@ class PrepareOperator(BaseOperator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.l: int
+        self.ldap_obj: object
 
     @BaseOperator.cancel_if_error
     def execute(self):
@@ -34,25 +34,23 @@ class PrepareOperator(BaseOperator):
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
 
         ldap_conf = conf['ldap']
-        l = ldap.initialize(ldap_conf['url'])
-        l.simple_bind_s(ldap_conf['bind_dn'], ldap_conf['bind_pw'])
-        self.l = l
+        self.ldap_obj = ldap.initialize(ldap_conf['url'])
+        self.ldap_obj.simple_bind_s(ldap_conf['bind_dn'], ldap_conf['bind_pw'])
 
     def unbind_ldap(self):
-        self.l.unbind_s()
+        self.ldap_obj.unbind_s()
 
     def get_ldap_users(self):
         var = self.var
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
 
         logger.info('get AD/ldap group users ...')
-        l = self.l
         ldap_conf = conf['ldap']
         re_1st_ou = re.compile(r'CN=[^,]+,OU=([^,]+),')
-        search_res = l.search(ldap_conf['base_dn'], ldap.SCOPE_SUBTREE, ldap_conf['filter'], ldap_conf['attrs'])
+        search_res = self.ldap_obj.search(ldap_conf['base_dn'], ldap.SCOPE_SUBTREE, ldap_conf['filter'], ldap_conf['attrs'])
         users = []
         while True:
-            result_type, result_data = l.result(search_res, 0)
+            result_type, result_data = self.ldap_obj.result(search_res, 0)
             if (len(result_data) == 0):
                 break
             result_type == ldap.RES_SEARCH_ENTRY and users.append(result_data)

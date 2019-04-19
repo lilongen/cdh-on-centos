@@ -5,6 +5,4 @@ channels:
 dependencies:
   - python=3.6
   - pip:
-    - jinja2
-    - python-ldap
-    - ruamel.yaml
+    - pexpect
