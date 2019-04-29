@@ -1,0 +1,25 @@
+subject: 新的vpn账号, 老的账号将被关闭
+from: lile@yxt.com
+
+msg: "
+Hi, {{ name }}\n
+附件是新的vpn账号相关文件: \n\n
+大家今天都试一下, 是不是都能用!!!\n
+大家今天都试一下, 是不是都能用!!!\n
+大家今天都试一下, 是不是都能用!!!\n
+\n\n
+{{ name }}.crt \n
+{{ name }}.key \n
+\n\n
+config/ca.crt \n
+config/ta.crt \n
+config/client.ovpn \n
+\n\n
+在config/client.ovpn 文件中大家改一下证书及私钥文件名为自己的!\n
+在config/client.ovpn 文件中大家改一下证书及私钥文件名为自己的!\n
+在config/client.ovpn 文件中大家改一下证书及私钥文件名为自己的!\n
+
+
+
+Thanks,\n
+lile"
