@@ -53,8 +53,7 @@ def generate_user_zip_file(username):
         except Exception as e:
             logger.error(e)
             logger.error('add %s error ...' %f)
-            zf.close()
-            return False
+            break
 
     zf.close()
     return True
