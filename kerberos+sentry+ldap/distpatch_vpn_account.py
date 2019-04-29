@@ -38,7 +38,8 @@ def get_conf():
         template = Template(f.read())
     conf = YAML().load(template.render(**tpl_vars))
 
-def generate_user_zip_file(username):
+
+def generate_user_pack(username):
     files = [
         '%s.crt' % username,
         '%s.key' % username,
@@ -53,11 +54,11 @@ def generate_user_zip_file(username):
         except Exception as e:
             logger.error(e)
             logger.error('add %s error ...' %f)
-            break
-
+            zf.close()
+            return False
+        
     zf.close()
     return True
-
 
 
 def main():
@@ -66,30 +67,27 @@ def main():
     get_conf()
 
     info = conf['mail']
-    mailer = Mailer(server=info['server'],
-                    sender=info['sender'],
-                    username=info['username'],
-                    password=info['password'])
-    user_keytab = {}
-    for g_name, g in conf['group'].items():
-        for username in g['user']:
-            user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['keytab_output_to'], username)
+    mailer = Mailer(
+        server=info['server'],
+        sender=info['sender'],
+        username=info['username'],
+        password=info['password']
+    )
 
     with open('{cwd}/conf/mail.vpn.account.tpl.yml'.format(**tpl_vars), 'r') as f_tpl:
         tpl = f_tpl.read()
 
-    vpn_account_file_location = '/Users/lilongen/onedrive/new.vpn.account'
-    os.chdir(vpn_account_file_location)
+    vpn_account_key_crt_location = '/Users/lilongen/onedrive/new.vpn.account'
+    os.chdir(vpn_account_key_crt_location)
     suzhou = ['lile', 'luoyw', 'baosy', 'liukl', 'tangzx', 'wangxt', 'jingwz', 'yujun', 'suxj', 'yangwb', 'yyc', 'maocy', 'xuxt']
     nanjing = ['liuzl', 'wanglj', 'guoqp', 'liuc', 'sunxf']
-
-    for username in (suzhou + nanjing):
-    #for username in ['lile', 'lile']:
+    users = suzhou + nanjing
+    # users = ['lile']
+    for username in users:
         tpl_vars['name'] = username
-        tpl_vars['kerberos_realm'] = conf['kerberos']['realm']
         mail = YAML().load(Template(tpl).render(**tpl_vars))
         mail['to'] = '%s@yxt.com' % username
-        ret = generate_user_zip_file(username)
+        ret = generate_user_pack(username)
         if not ret:
             continue
 
