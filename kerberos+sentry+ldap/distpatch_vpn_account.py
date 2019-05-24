@@ -56,7 +56,7 @@ def generate_user_pack(username):
             logger.error('add %s error ...' %f)
             zf.close()
             return False
-        
+
     zf.close()
     return True
 

@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 #
+# Mailer: mail utility tool
+#
 # known issue:
 #   cause python3.7 openssl changes, smtp = smtplib.SMTP().starttls() will failed
 #   so this mailer does not work at python3.7
 #
+
 import smtplib
 from email.header import Header
 from email.mime.application import MIMEApplication
