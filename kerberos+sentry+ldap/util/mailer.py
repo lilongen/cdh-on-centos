@@ -3,7 +3,6 @@
 #
 # Mailer: mail utility tool
 #
-#
 
 import smtplib
 from email.header import Header
@@ -37,6 +36,7 @@ class Mailer(object):
         smtp_cli.connect(self.server)
         # Unless you wish to use has_extn() before sending mail, it should not be necessary to call this method explicitly. It will be implicitly called by sendmail() when necessary.
         # https://docs.python.org/3/library/smtplib.html#smtplib.SMTP.has_extn
+        #
         #smtp_cli.ehlo()
         #smtp_cli.starttls() # does not work in py3.7
         #smtp_cli.ehlo()
