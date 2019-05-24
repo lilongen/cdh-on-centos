@@ -82,7 +82,7 @@ def main():
     suzhou = ['lile', 'luoyw', 'baosy', 'liukl', 'tangzx', 'wangxt', 'jingwz', 'yujun', 'suxj', 'yangwb', 'yyc', 'maocy', 'xuxt']
     nanjing = ['liuzl', 'wanglj', 'guoqp', 'liuc', 'sunxf']
     users = suzhou + nanjing
-    # users = ['lile']
+    users = ['lile']
     for username in users:
         tpl_vars['name'] = username
         mail = YAML().load(Template(tpl).render(**tpl_vars))

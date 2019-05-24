@@ -3,9 +3,6 @@
 #
 # Mailer: mail utility tool
 #
-# known issue:
-#   cause python3.7 openssl changes, smtp = smtplib.SMTP().starttls() will failed
-#   so this mailer does not work at python3.7
 #
 
 import smtplib
@@ -38,9 +35,11 @@ class Mailer(object):
     def connect(self):
         smtp_cli = smtplib.SMTP()
         smtp_cli.connect(self.server)
-        smtp_cli.ehlo()
-        smtp_cli.starttls() # does not work in py3.7
-        smtp_cli.ehlo()
+        # Unless you wish to use has_extn() before sending mail, it should not be necessary to call this method explicitly. It will be implicitly called by sendmail() when necessary.
+        # https://docs.python.org/3/library/smtplib.html#smtplib.SMTP.has_extn
+        #smtp_cli.ehlo()
+        #smtp_cli.starttls() # does not work in py3.7
+        #smtp_cli.ehlo()
         smtp_cli.login(self.username, self.password)
         self.smtp_cli = smtp_cli
 
