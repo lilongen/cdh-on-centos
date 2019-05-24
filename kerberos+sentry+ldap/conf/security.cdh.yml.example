@@ -11,11 +11,13 @@ ldap:
 
 group:
   g_dev:
+    groupmod: primary
     user: %user_list_in_above_ldap_filter
     workspace: /ws.g_dev
     hdfs_workspace: /ws.g_dev
     hive_role: r_dev
   g_prod:
+    groupmod: primary
     user: [prodrt, prodol]
     workspace: /ws.g_prod
     hdfs_workspace: /ws.g_prod
