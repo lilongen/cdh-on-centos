@@ -37,9 +37,9 @@ class AnsibleOperator(BaseOperator):
                 }
             })
             tasks.append({
-                'name': 'Ensure directory "{}" exists'.format(g['workspace']),
+                'name': 'Ensure directory "{}" exists'.format(g['os_workspace']),
                 'file': {
-                    'path': g['workspace'],
+                    'path': g['os_workspace'],
                     'state': 'directory',
                     'mode': '0755',
                     'group': g_name,
@@ -53,7 +53,7 @@ class AnsibleOperator(BaseOperator):
                         'name': u,
                         'state': 'present',
                         'group': g_name,
-                        'home': '{workspace}/{user}'.format(workspace=g['workspace'], user=u)
+                        'home': '{os_workspace}/{user}'.format(os_workspace=g['os_workspace'], user=u)
                     }
                 })
 
