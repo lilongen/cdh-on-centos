@@ -79,7 +79,7 @@ class AnsibleOperator(BaseOperator):
 
         playbook = [{
             'name': 'Operating cluster hosts group, user, directory ...',
-            'hosts': 'all',
+            'hosts': conf['ansible']['cdh_host_pattern'],
             'user': 'root',
             'tasks': tasks
         }]
