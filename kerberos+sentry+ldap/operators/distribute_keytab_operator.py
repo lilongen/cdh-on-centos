@@ -31,9 +31,8 @@ class DistributeKeytabOperator(BaseOperator):
                         username=info['username'],
                         password=info['password'])
         user_keytab = {}
-        for g_name, g in conf['group'].items():
-            for username in g['user']:
-                user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['keytab_output_to'], username)
+        for username in conf['group']['primary_mode']['g_dev']['member']:
+            user_keytab[username] = '{}/{}.keytab'.format(conf['kerberos']['keytab_output_to'], username)
 
         with open('{cwd}/conf/mail.keytab.distribute.tpl.yml'.format(**tpl_vars), 'r') as f_tpl:
             tpl = f_tpl.read()

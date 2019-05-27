@@ -26,9 +26,6 @@ class PrepareOperator(BaseOperator):
         logger.info('get cluster host precense user and group info ...')
         self.get_node_user_group()
 
-        logger.info('get diff between valid AD user and precense info  ...')
-        self.get_presence_and_yaml_diff()
-
     def bind_ldap(self):
         var = self.var
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
@@ -62,7 +59,7 @@ class PrepareOperator(BaseOperator):
             user_id = entry[0][1]['sAMAccountName'][0].decode()
             user_1stou = re.match(re_1st_ou, user_dn).group(1)
             user_ids.append(user_id)
-        conf['group']['g_dev']['user'] = user_ids
+        conf['group']['primary_mode']['g_dev']['member'] = user_ids
 
     def get_node_user_group(self):
         var = self.var
@@ -75,26 +72,6 @@ class PrepareOperator(BaseOperator):
             group_users[g] = {}
             result = subprocess.check_output('lid -n -g {}'.format(g), shell=True)
             users = result.decode().split('\n')[0:-1]
-            group_users[g]['user'] = list(map(lambda x: re.sub('^\s+', '', x), users))
+            group_users[g]['member'] = list(map(lambda x: re.sub('^\s+', '', x), users))
 
-        conf['presence_role'] = group_users
-
-    def get_presence_and_yaml_diff(self):
-        var = self.var
-        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
-
-        presence = conf['presence_role']
-        definition = conf['group']
-        diff = {
-            'group': [],
-            'user': {}
-        }
-        for pk, pv in presence.items():
-            if definition.get(pk) is None:
-                diff['group'].append(pk)
-                diff['user'][pk] = pv
-            else:
-                diff['user'][pk] = {}
-                diff['user'][pk]['user'] = set(pv['user']) - set(definition[pk]['user'])
-        conf['diff_del'] = diff
-        logger.debug(diff)
+        conf['present_group'] = group_users

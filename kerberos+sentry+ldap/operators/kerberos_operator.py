@@ -28,15 +28,18 @@ class KerberosOperator(BaseOperator):
         delprinc_tpl = kadmin_with_credential + 'delprinc -force {username}'
         cmds = ''
         vars = conf['kerberos']
-        for g_name, g in conf['group'].items():
-            for u in g['user']:
+        # delete present principal
+        for g_name, g in conf['present_group'].items():
+            for u in g['member']:
+                vars['username'] = u
+                cmds += delprinc_tpl.format(**vars) + '\n'
+
+        # add yaml definition user principal
+        for g_name, g in conf['group']['primary_mode'].items():
+            for u in g['member']:
                 vars['username'] = u
                 cmds += addprinc_tpl.format(**vars) + '\n'
                 cmds += ktadd_tpl.format(**vars) + '\n'
-        for g_name, g in conf['diff_del']['user'].items():
-            for u in g['user']:
-                vars['username'] = u
-                cmds += delprinc_tpl.format(**vars) + '\n'
 
         util.mkdir_p(conf['kerberos']['todo'])
         sh = conf['kerberos']['todo']

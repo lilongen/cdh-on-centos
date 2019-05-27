@@ -27,38 +27,8 @@ class AnsibleOperator(BaseOperator):
         (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
 
         tasks = []
-        # generate new part
-        for g_name, g in conf['group'].items():
-            tasks.append({
-                'name': 'Ensure group "{}" exists'.format(g_name),
-                'group': {
-                    'name': g_name,
-                    'state': 'present'
-                }
-            })
-            tasks.append({
-                'name': 'Ensure directory "{}" exists'.format(g['os_workspace']),
-                'file': {
-                    'path': g['os_workspace'],
-                    'state': 'directory',
-                    'mode': '0755',
-                    'group': g_name,
-                }
-            })
-
-            for u in g['user']:
-                tasks.append({
-                    'name': 'Ensure user "{}" exist, and belong to group "{}'"".format(u, g_name),
-                    'user': {
-                        'name': u,
-                        'state': 'present',
-                        'group': g_name,
-                        'home': '{os_workspace}/{user}'.format(os_workspace=g['os_workspace'], user=u)
-                    }
-                })
-
-        # generate deleted part
-        for g_name in conf['diff_del']['group']:
+        # generate delete present user and group
+        for g_name, g in conf['present_group'].items():
             tasks.append({
                 'name': 'Delete group "{}"'.format(g_name),
                 'group': {
@@ -66,8 +36,8 @@ class AnsibleOperator(BaseOperator):
                     'state': 'absent'
                 }
             })
-        for g_name, g in conf['diff_del']['user'].items():
-            for u in g['user']:
+
+            for u in g['member']:
                 tasks.append({
                     'name': 'Delete user "{}" '.format(u),
                     'user': {
@@ -76,6 +46,42 @@ class AnsibleOperator(BaseOperator):
                         'remove': 'yes'
                     }
                 })
+
+        # generate yaml definition user and group
+        for group_mode in conf['group']:
+            for g_name, g in conf['group'][group_mode].items():
+                tasks.append({
+                    'name': 'Ensure group "{}" exists'.format(g_name),
+                    'group': {
+                        'name': g_name,
+                        'state': 'present'
+                    }
+                })
+
+                if g.get('os_home') is not None:
+                    tasks.append({
+                        'name': 'Ensure directory "{}" exists'.format(g['os_home']),
+                        'file': {
+                            'path': g['os_home'],
+                            'state': 'directory',
+                            'mode': '0755',
+                            'group': g_name,
+                        }
+                    })
+
+                for u in g['member']:
+                    entry = {
+                        'name': 'Ensure user "{}" exist, and belong to group "{}"'.format(u, g_name),
+                        'user': {
+                            'name': u,
+                            'state': 'present',
+                            'group': g_name,
+                            'append': group_mode == 'supplementary_mode'
+                        }
+                    }
+                    if g.get('os_home') is not None:
+                        entry['user']['home'] = '{os_home}/{user}'.format(os_home=g['os_home'], user=u)
+                    tasks.append(entry)
 
         playbook = [{
             'name': 'Operating cluster hosts group, user, directory ...',

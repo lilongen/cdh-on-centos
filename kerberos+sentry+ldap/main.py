@@ -9,6 +9,7 @@ import logging
 from ruamel.yaml import YAML
 from jinja2 import Template
 from logging.config import dictConfig
+import click
 
 from util.utility import Utility
 from operators.prepare_operator import PrepareOperator
@@ -17,8 +18,6 @@ from operators.hdfs_operator import HdfsOperator
 from operators.kerberos_operator import KerberosOperator
 from operators.distribute_keytab_operator import DistributeKeytabOperator
 
-
-dryrun = len(sys.argv) > 1 and str(sys.argv[1]).lower() == 'dryrun'
 
 logger: logging.Logger
 conf: dict
@@ -41,8 +40,12 @@ def get_conf():
     conf = YAML().load(template.render(**tpl_vars))
 
 
-def main():
+@click.command()
+@click.option('-d', '--dryrun', 'dryrun', type=bool, default=True, required=False)
+@click.option('-f', '--filter', 'filter', type=str, default='*', required=False)
+def main(dryrun, filter):
     print('init app ...')
+
     init_logger()
     get_conf()
 
@@ -60,8 +63,12 @@ def main():
         'KerberosOperator',
         'DistributeKeytabOperator',
     )
+    filter = filter.split(',')
     for name in operators:
-        globals()[name](**operator_kwargs).execute()
+        if name == 'PrepareOperator' \
+            or '*' in filter \
+            or name in filter:
+            globals()[name](**operator_kwargs).execute()
 
 
 if __name__ == "__main__":
