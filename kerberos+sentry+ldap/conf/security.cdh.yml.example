@@ -10,18 +10,25 @@ ldap:
   attrs: [sAMAccountName, mail, mobile]
 
 group:
-  g_dev:
-    groupmod: primary
-    user: %user_list_in_above_ldap_filter
-    workspace: /ws.g_dev
-    hdfs_home: /ws.g_dev
-    hive_role: r_dev
-  g_prod:
-    groupmod: primary
-    user: [prodrt, prodol]
-    workspace: /ws.g_prod
-    hdfs_home: /ws.g_prod
-    hive_role: r_prod
+  primary_mode:
+    g_dev:
+      member: ['users.vaildated.by.ldap.filter']
+      os_home: /ws.dev
+      hdfs_home: /ws.dev
+      hive_role: r_dev
+    g_prod:
+      member: [u_rt, u_ol]
+      os_home: /ws.prod
+      hdfs_home: /ws.prod
+      hive_role: r_prod
+    g_etl:
+      member: [u_etl]
+      os_home: /ws.etl
+      hdfs_home: /ws.etl
+      hive_role: r_etl
+  supplementary_mode:
+    g_etl:
+      member: [lile, baosy, tangzx]
 
 ansible:
   inventory: /etc/ansible/hosts
