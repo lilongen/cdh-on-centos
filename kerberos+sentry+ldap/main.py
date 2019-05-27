@@ -49,7 +49,7 @@ def main(dryrun, filter):
     print('init app ...')
 
     init_ns(dryrun)
-    enabled_operators = ['PrepareOperator'] + filter.split(',')
+    enabled_list = ['PrepareOperator'] + filter.split(',')
 
     operators = (
         'PrepareOperator',
@@ -59,7 +59,7 @@ def main(dryrun, filter):
         'DistributeKeytabOperator',
     )
     for name in operators:
-        if '*' in filter or name in enabled_operators:
+        if '*' in filter or name in enabled_list:
             globals()[name]().execute()
 
 

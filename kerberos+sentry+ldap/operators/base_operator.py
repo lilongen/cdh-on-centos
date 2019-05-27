@@ -10,16 +10,6 @@ class BaseOperator(object, metaclass=ABCMeta):
     """
 
     err = 0
-    valid_keyword = (
-        'dryrun',
-        'logger',
-        'conf',
-        'util',
-        'tpl_vars',
-    )
-    # dict object hold cross-operator consistent data needed by operator
-    # it will be init by __init__
-    var: dict
 
     def valid_kwargs(callable_):
         def wrapper(self, *args, **kwargs):
@@ -43,7 +33,6 @@ class BaseOperator(object, metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, **kwargs):
         pass
-        #self.var = kwargs
 
     @abstractmethod
     def execute(self) -> None:
