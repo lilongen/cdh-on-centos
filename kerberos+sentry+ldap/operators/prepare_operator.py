@@ -4,6 +4,7 @@ import ldap
 import re
 import subprocess
 from .base_operator import BaseOperator
+from ns import ns
 
 
 class PrepareOperator(BaseOperator):
@@ -14,23 +15,17 @@ class PrepareOperator(BaseOperator):
 
     @BaseOperator.cancel_if_error
     def execute(self):
-        var = self.var
-        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
-
-        logger.info('PrepareOperator ...')
-        logger.info('get valid AD user in specail group ...')
+        ns.logger.info('PrepareOperator ...')
+        ns.logger.info('get valid AD user in specail group ...')
         self.bind_ldap()
         self.get_ldap_users()
         self.unbind_ldap()
 
-        logger.info('get cluster host precense user and group info ...')
+        ns.logger.info('get cluster host precense user and group info ...')
         self.get_node_user_group()
 
     def bind_ldap(self):
-        var = self.var
-        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
-
-        ldap_conf = conf['ldap']
+        ldap_conf = ns.conf['ldap']
         self.ldap_obj = ldap.initialize(ldap_conf['url'])
         self.ldap_obj.simple_bind_s(ldap_conf['bind_dn'], ldap_conf['bind_pw'])
 
@@ -38,11 +33,8 @@ class PrepareOperator(BaseOperator):
         self.ldap_obj.unbind_s()
 
     def get_ldap_users(self):
-        var = self.var
-        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
-
-        logger.info('get AD/ldap group users ...')
-        ldap_conf = conf['ldap']
+        ns.logger.info('get AD/ldap group users ...')
+        ldap_conf = ns.conf['ldap']
         re_1st_ou = re.compile(r'CN=[^,]+,OU=([^,]+),')
         search_res = self.ldap_obj.search(ldap_conf['base_dn'], ldap.SCOPE_SUBTREE, ldap_conf['filter'], ldap_conf['attrs'])
         users = []
@@ -59,12 +51,9 @@ class PrepareOperator(BaseOperator):
             user_id = entry[0][1]['sAMAccountName'][0].decode()
             user_1stou = re.match(re_1st_ou, user_dn).group(1)
             user_ids.append(user_id)
-        conf['group']['primary_mode']['g_dev']['member'] = user_ids
+        ns.conf['group']['primary_mode']['g_dev']['member'] = user_ids
 
     def get_node_user_group(self):
-        var = self.var
-        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
-
         result = subprocess.check_output("grep g_ /etc/group | awk -F: '{print $1}'", shell=True)
         groups = result.decode().split('\n')[0:-1]
         group_users = {}
@@ -74,4 +63,4 @@ class PrepareOperator(BaseOperator):
             users = result.decode().split('\n')[0:-1]
             group_users[g]['member'] = list(map(lambda x: re.sub('^\s+', '', x), users))
 
-        conf['present_group'] = group_users
+        ns.conf['present_group'] = group_users

@@ -11,6 +11,7 @@ from jinja2 import Template
 from logging.config import dictConfig
 import click
 
+from ns import ns
 from util.utility import Utility
 from operators.prepare_operator import PrepareOperator
 from operators.ansible_operator import AnsibleOperator
@@ -19,25 +20,26 @@ from operators.kerberos_operator import KerberosOperator
 from operators.distribute_keytab_operator import DistributeKeytabOperator
 
 
-logger: logging.Logger
-conf: dict
-util = Utility()
-tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
-
-
-def init_logger():
-    global logger
-    with open('{cwd}/conf/logging.yml'.format(**tpl_vars), 'r') as f:
+def get_logger():
+    with open('{cwd}/conf/logging.yml'.format(** ns.tpl_vars), 'r') as f:
         logging_config = YAML().load(f)
     dictConfig(logging_config)
-    logger = logging.getLogger()
+    return logging.getLogger()
 
 
 def get_conf():
-    global conf
-    with open('{cwd}/conf/security.cdh.yml'.format(**tpl_vars), 'r') as f:
+    with open('{cwd}/conf/security.cdh.yml'.format(** ns.tpl_vars), 'r') as f:
         template = Template(f.read())
-    conf = YAML().load(template.render(**tpl_vars))
+    return YAML().load(template.render(**ns.tpl_vars))
+
+
+def init_ns(dryrun):
+    ns.dryrun = dryrun
+    ns.tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
+    ns.util = Utility()
+
+    ns.logger = get_logger()
+    ns.conf = get_conf()
 
 
 @click.command()
@@ -46,16 +48,8 @@ def get_conf():
 def main(dryrun, filter):
     print('init app ...')
 
-    init_logger()
-    get_conf()
+    init_ns(dryrun)
 
-    operator_kwargs = {
-        'dryrun': dryrun,
-        'logger': logger,
-        'conf': conf,
-        'util': util,
-        'tpl_vars': tpl_vars
-    }
     operators = (
         'PrepareOperator',
         'AnsibleOperator',
@@ -68,7 +62,7 @@ def main(dryrun, filter):
         if name == 'PrepareOperator' \
             or '*' in filter \
             or name in filter:
-            globals()[name](**operator_kwargs).execute()
+            globals()[name]().execute()
 
 
 if __name__ == "__main__":

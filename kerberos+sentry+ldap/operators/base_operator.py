@@ -39,10 +39,11 @@ class BaseOperator(object, metaclass=ABCMeta):
                 return (lambda: None)()
         return wrapper
 
-    @valid_kwargs
+    #@valid_kwargs
     @abstractmethod
     def __init__(self, **kwargs):
-        self.var = kwargs
+        pass
+        #self.var = kwargs
 
     @abstractmethod
     def execute(self) -> None:

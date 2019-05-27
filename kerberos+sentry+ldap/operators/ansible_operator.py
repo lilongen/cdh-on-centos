@@ -3,6 +3,7 @@
 from ruamel.yaml import YAML
 import subprocess
 from .base_operator import BaseOperator
+from ns import ns
 
 
 class AnsibleOperator(BaseOperator):
@@ -12,24 +13,19 @@ class AnsibleOperator(BaseOperator):
 
     @BaseOperator.cancel_if_error
     def execute(self):
-        var = self.var
-        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
-
-        logger.info('AnsibleOperator ...')
-        logger.info('generate group, user, directory playbook ...')
+        ns.logger.info('AnsibleOperator ...')
+        ns.logger.info('generate group, user, directory playbook ...')
         self.generate_group_user_directory_playbook()
 
-        logger.info('play group, user, directory playbook ...')
+        ns.logger.info('play group, user, directory playbook ...')
         self.play_group_user_playbook()
 
     def generate_group_user_directory_playbook(self):
-        var = self.var
-        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
-
         tasks = []
         # generate delete present user and group
-        for g_name, g in conf['present_group'].items():
-            tasks.append({
+        delete_group_tasks = []
+        for g_name, g in ns.conf['present_group'].items():
+            delete_group_tasks.append({
                 'name': 'Delete group "{}"'.format(g_name),
                 'group': {
                     'name': g_name,
@@ -46,10 +42,12 @@ class AnsibleOperator(BaseOperator):
                         'remove': 'yes'
                     }
                 })
+        # delete group after all user deleted
+        tasks += delete_group_tasks
 
         # generate yaml definition user and group
-        for group_mode in conf['group']:
-            for g_name, g in conf['group'][group_mode].items():
+        for group_mode in ns.conf['group']:
+            for g_name, g in ns.conf['group'][group_mode].items():
                 tasks.append({
                     'name': 'Ensure group "{}" exists'.format(g_name),
                     'group': {
@@ -85,24 +83,21 @@ class AnsibleOperator(BaseOperator):
 
         playbook = [{
             'name': 'Operating cluster hosts group, user, directory ...',
-            'hosts': conf['ansible']['cdh_host_pattern'],
+            'hosts': ns.conf['ansible']['cdh_host_pattern'],
             'user': 'root',
             'tasks': tasks
         }]
-        util.mkdir_p(conf['ansible']['todo'])
-        with open(conf['ansible']['todo'], 'w') as f:
+        ns.util.mkdir_p(ns.conf['ansible']['todo'])
+        with open(ns.conf['ansible']['todo'], 'w') as f:
             YAML().dump(playbook, f)
 
     def play_group_user_playbook(self):
-        var = self.var
-        (dryrun, logger, conf, util, tpl_vars) = (var['dryrun'], var['logger'], var['conf'], var['util'], var['tpl_vars'])
-
         ansible_cmd = 'ansible-playbook -i {inventory} {playbook}'.format(
-            inventory=conf['ansible']['inventory'],
-            playbook=conf['ansible']['todo']
+            inventory=ns.conf['ansible']['inventory'],
+            playbook=ns.conf['ansible']['todo']
         )
-        logger.info(ansible_cmd)
-        if dryrun:
+        ns.logger.info(ansible_cmd)
+        if ns.dryrun:
             return
         ret = subprocess.call(ansible_cmd, shell=True)
-        logger.debug(ret)
+        ns.logger.debug(ret)
