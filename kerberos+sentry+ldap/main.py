@@ -35,9 +35,9 @@ def get_conf():
 
 def init_ns(dryrun):
     ns.dryrun = dryrun
-    ns.tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
     ns.util = Utility()
-
+    # required by following two lines
+    ns.tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
     ns.logger = get_logger()
     ns.conf = get_conf()
 
@@ -49,6 +49,7 @@ def main(dryrun, filter):
     print('init app ...')
 
     init_ns(dryrun)
+    enabled_operators = ['PrepareOperator'] + filter.split(',')
 
     operators = (
         'PrepareOperator',
@@ -57,11 +58,8 @@ def main(dryrun, filter):
         'KerberosOperator',
         'DistributeKeytabOperator',
     )
-    filter = filter.split(',')
     for name in operators:
-        if name == 'PrepareOperator' \
-            or '*' in filter \
-            or name in filter:
+        if '*' in filter or name in enabled_operators:
             globals()[name]().execute()
 
 
