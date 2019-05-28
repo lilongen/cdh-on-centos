@@ -3,7 +3,7 @@
 from ruamel.yaml import YAML
 import subprocess
 from .base_operator import BaseOperator
-from ns import ns
+from global_vars import gv
 
 
 class AnsibleOperator(BaseOperator):
@@ -13,18 +13,18 @@ class AnsibleOperator(BaseOperator):
 
     @BaseOperator.cancel_if_error
     def execute(self):
-        ns.logger.info('AnsibleOperator ...')
-        ns.logger.info('generate group, user, directory playbook ...')
+        gv.logger.info('AnsibleOperator ...')
+        gv.logger.info('generate group, user, directory playbook ...')
         self.generate_group_user_directory_playbook()
 
-        ns.logger.info('play group, user, directory playbook ...')
+        gv.logger.info('play group, user, directory playbook ...')
         self.play_group_user_playbook()
 
     def generate_group_user_directory_playbook(self):
         tasks = []
         # generate delete present user and group
         delete_group_tasks = []
-        for g_name, g in ns.conf['present_group'].items():
+        for g_name, g in gv.conf['present_group'].items():
             delete_group_tasks.append({
                 'name': 'Delete group "{}"'.format(g_name),
                 'group': {
@@ -46,8 +46,8 @@ class AnsibleOperator(BaseOperator):
         tasks += delete_group_tasks
 
         # generate yaml definition user and group
-        for group_mode in ns.conf['group']:
-            for g_name, g in ns.conf['group'][group_mode].items():
+        for group_mode in gv.conf['group']:
+            for g_name, g in gv.conf['group'][group_mode].items():
                 tasks.append({
                     'name': 'Ensure group "{}" exists'.format(g_name),
                     'group': {
@@ -83,21 +83,21 @@ class AnsibleOperator(BaseOperator):
 
         playbook = [{
             'name': 'Operating cluster hosts group, user, directory ...',
-            'hosts': ns.conf['ansible']['cdh_host_pattern'],
+            'hosts': gv.conf['ansible']['cdh_host_pattern'],
             'user': 'root',
             'tasks': tasks
         }]
-        ns.util.mkdir_p(ns.conf['ansible']['todo'])
-        with open(ns.conf['ansible']['todo'], 'w') as f:
+        gv.util.mkdir_p(gv.conf['ansible']['todo'])
+        with open(gv.conf['ansible']['todo'], 'w') as f:
             YAML().dump(playbook, f)
 
     def play_group_user_playbook(self):
         ansible_cmd = 'ansible-playbook -i {inventory} {playbook}'.format(
-            inventory=ns.conf['ansible']['inventory'],
-            playbook=ns.conf['ansible']['todo']
+            inventory=gv.conf['ansible']['inventory'],
+            playbook=gv.conf['ansible']['todo']
         )
-        ns.logger.info(ansible_cmd)
-        if ns.dryrun:
+        gv.logger.info(ansible_cmd)
+        if gv.dryrun:
             return
         ret = subprocess.call(ansible_cmd, shell=True)
-        ns.logger.debug(ret)
+        gv.logger.debug(ret)

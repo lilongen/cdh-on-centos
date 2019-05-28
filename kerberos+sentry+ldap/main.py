@@ -11,7 +11,7 @@ from jinja2 import Template
 from logging.config import dictConfig
 import click
 
-from ns import ns
+from global_vars import gv
 from util.utility import Utility
 from operators.prepare_operator import PrepareOperator
 from operators.ansible_operator import AnsibleOperator
@@ -21,25 +21,25 @@ from operators.distribute_keytab_operator import DistributeKeytabOperator
 
 
 def get_logger():
-    with open('{cwd}/conf/logging.yml'.format(** ns.tpl_vars), 'r') as f:
+    with open('{cwd}/conf/logging.yml'.format(** gv.tpl_vars), 'r') as f:
         logging_config = YAML().load(f)
     dictConfig(logging_config)
     return logging.getLogger()
 
 
 def get_conf():
-    with open('{cwd}/conf/security.cdh.yml'.format(** ns.tpl_vars), 'r') as f:
+    with open('{cwd}/conf/security.cdh.yml'.format(** gv.tpl_vars), 'r') as f:
         template = Template(f.read())
-    return YAML().load(template.render(**ns.tpl_vars))
+    return YAML().load(template.render(**gv.tpl_vars))
 
 
 def init_ns(dryrun):
-    ns.dryrun = dryrun
-    ns.util = Utility()
+    gv.dryrun = dryrun
+    gv.util = Utility()
     # required by following two lines
-    ns.tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
-    ns.logger = get_logger()
-    ns.conf = get_conf()
+    gv.tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
+    gv.logger = get_logger()
+    gv.conf = get_conf()
 
 
 @click.command()

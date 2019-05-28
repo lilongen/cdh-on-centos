@@ -2,7 +2,7 @@
 
 import subprocess
 from .base_operator import BaseOperator
-from ns import ns
+from global_vars import gv
 
 
 class KerberosOperator(BaseOperator):
@@ -12,8 +12,8 @@ class KerberosOperator(BaseOperator):
 
     @BaseOperator.cancel_if_error
     def execute(self):
-        ns.logger.info('KerberosOperator ...')
-        ns.logger.info('operate principle and generate keytab ...')
+        gv.logger.info('KerberosOperator ...')
+        gv.logger.info('operate principle and generate keytab ...')
         self.operate_principle()
 
     def operate_principle(self):
@@ -22,27 +22,27 @@ class KerberosOperator(BaseOperator):
         ktadd_tpl = kadmin_with_credential + 'ktadd -k {keytab_output_to}/{username}.keytab {username}'
         delprinc_tpl = kadmin_with_credential + 'delprinc -force {username}'
         cmds = ''
-        vars = ns.conf['kerberos']
+        vars = gv.conf['kerberos']
         # delete present principal
-        for g_name, g in ns.conf['present_group'].items():
+        for g_name, g in gv.conf['present_group'].items():
             for u in g['member']:
                 vars['username'] = u
                 cmds += delprinc_tpl.format(**vars) + '\n'
 
         # add yaml definition user principal
-        for g_name, g in ns.conf['group']['primary_mode'].items():
+        for g_name, g in gv.conf['group']['primary_mode'].items():
             for u in g['member']:
                 vars['username'] = u
                 cmds += addprinc_tpl.format(**vars) + '\n'
                 cmds += ktadd_tpl.format(**vars) + '\n'
 
-        ns.util.mkdir_p(ns.conf['kerberos']['todo'])
-        sh = ns.conf['kerberos']['todo']
+        gv.util.mkdir_p(gv.conf['kerberos']['todo'])
+        sh = gv.conf['kerberos']['todo']
         with open(sh, 'w') as f:
             f.write(cmds)
 
-        if ns.dryrun:
+        if gv.dryrun:
             return
 
         ret = subprocess.call('bash {}'.format(sh), shell=True)
-        ns.logger.info(ret)
+        gv.logger.info(ret)

@@ -13,9 +13,6 @@ class BaseOperator(object, metaclass=ABCMeta):
 
     def valid_kwargs(callable_):
         def wrapper(self, *args, **kwargs):
-            if sorted(self.valid_keyword) != sorted(kwargs):
-                print('{}.__init__(): missing needed kwarg'.format(type(self)))
-                self.err = 1
             return callable_(self, *args, **kwargs)
         return wrapper
 
@@ -29,9 +26,9 @@ class BaseOperator(object, metaclass=ABCMeta):
                 return (lambda: None)()
         return wrapper
 
-    #@valid_kwargs
+    @valid_kwargs
     @abstractmethod
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         pass
 
     @abstractmethod
