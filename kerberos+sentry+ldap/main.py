@@ -20,6 +20,19 @@ from operators.kerberos_operator import KerberosOperator
 from operators.distribute_keytab_operator import DistributeKeytabOperator
 
 
+def init_ns(dryrun):
+    gv.dryrun = dryrun
+    gv.util = Utility()
+    # required by following two lines
+    gv.tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
+    gv.logger = get_logger()
+    gv.conf = get_conf()
+
+
+def clean():
+    gv.util.rm('./output')
+
+
 def get_logger():
     with open('{cwd}/conf/logging.yml'.format(** gv.tpl_vars), 'r') as f:
         logging_config = YAML().load(f)
@@ -33,15 +46,6 @@ def get_conf():
     return YAML().load(template.render(**gv.tpl_vars))
 
 
-def init_ns(dryrun):
-    gv.dryrun = dryrun
-    gv.util = Utility()
-    # required by following two lines
-    gv.tpl_vars = {'cwd': os.path.dirname(sys.argv[0])}
-    gv.logger = get_logger()
-    gv.conf = get_conf()
-
-
 @click.command()
 @click.option('-d', '--dryrun', 'dryrun', type=bool, default=True, required=False)
 @click.option('-f', '--filter', 'filter', type=str, default='*', required=False)
@@ -49,7 +53,9 @@ def main(dryrun, filter):
     print('init app ...')
 
     init_ns(dryrun)
-    enabled_list = ['PrepareOperator'] + filter.split(',')
+
+    clean()
+    enabled_operators = ['PrepareOperator'] + filter.split(',')
 
     operators = (
         'PrepareOperator',
@@ -59,7 +65,7 @@ def main(dryrun, filter):
         'DistributeKeytabOperator',
     )
     for name in operators:
-        if '*' in filter or name in enabled_list:
+        if '*' in filter or name in enabled_operators:
             globals()[name]().execute()
 
 

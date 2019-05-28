@@ -1,5 +1,6 @@
 import os
 import errno
+import shutil
 
 
 class Utility():
@@ -16,5 +17,6 @@ class Utility():
             if e.errno != errno.EEXIST:
                 raise
 
-    def abc(self):
-        pass
+    @staticmethod
+    def rm(path):
+        shutil.rmtree(path)
