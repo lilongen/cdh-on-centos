@@ -24,6 +24,7 @@ class AnsibleOperator(BaseOperator):
         tasks = []
         # generate delete present user and group
         delete_group_tasks = []
+        users = {}
         for g_name, g in gv.conf['present_group'].items():
             delete_group_tasks.append({
                 'name': 'Delete group "{}"'.format(g_name),
@@ -34,6 +35,10 @@ class AnsibleOperator(BaseOperator):
             })
 
             for u in g['member']:
+                if users.get(u) is None:
+                    users[u] = 1
+                else:
+                    continue
                 tasks.append({
                     'name': 'Delete user "{}" '.format(u),
                     'user': {
@@ -73,12 +78,15 @@ class AnsibleOperator(BaseOperator):
                         'user': {
                             'name': u,
                             'state': 'present',
-                            'group': g_name,
                             'append': group_mode == 'supplementary_mode'
                         }
                     }
-                    if g.get('os_home') is not None:
-                        entry['user']['home'] = '{os_home}/{user}'.format(os_home=g['os_home'], user=u)
+                    if group_mode == 'primary_mode':
+                        if g.get('os_home') is not None:
+                            entry['user']['home'] = '{os_home}/{user}'.format(os_home=g['os_home'], user=u)
+                        entry['user']['group'] = g_name
+                    else:
+                        entry['user']['groups'] = [g_name]
                     tasks.append(entry)
 
         playbook = [{
