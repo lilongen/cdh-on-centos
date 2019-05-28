@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from abc import ABCMeta, abstractmethod
+from globals import gv
 
 
 class BaseOperator(object, metaclass=ABCMeta):
@@ -11,8 +12,9 @@ class BaseOperator(object, metaclass=ABCMeta):
 
     err = 0
 
-    def valid_kwargs(callable_):
+    def valid_gv(callable_):
         def wrapper(self, *args, **kwargs):
+            self.err = 0
             return callable_(self, *args, **kwargs)
         return wrapper
 
@@ -26,7 +28,7 @@ class BaseOperator(object, metaclass=ABCMeta):
                 return (lambda: None)()
         return wrapper
 
-    @valid_kwargs
+    @valid_gv
     @abstractmethod
     def __init__(self, *args, **kwargs):
         pass

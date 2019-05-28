@@ -7,8 +7,8 @@ from globals import gv
 
 class KerberosOperator(BaseOperator):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     @BaseOperator.cancel_if_error
     def execute(self):

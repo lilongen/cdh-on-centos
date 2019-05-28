@@ -9,8 +9,8 @@ from globals import gv
 
 class PrepareOperator(BaseOperator):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.ldap_obj: object
 
     @BaseOperator.cancel_if_error
