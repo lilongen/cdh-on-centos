@@ -4,7 +4,7 @@ import ldap
 import re
 import subprocess
 from .base_operator import BaseOperator
-from global_vars import gv
+from globals import gv
 
 
 class PrepareOperator(BaseOperator):

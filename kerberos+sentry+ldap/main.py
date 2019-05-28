@@ -11,7 +11,7 @@ from jinja2 import Template
 from logging.config import dictConfig
 import click
 
-from global_vars import gv
+from globals import gv
 from util.utility import Utility
 from operators.prepare_operator import PrepareOperator
 from operators.ansible_operator import AnsibleOperator

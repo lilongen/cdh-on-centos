@@ -4,7 +4,7 @@ from ruamel.yaml import YAML
 from jinja2 import Template
 from util.mailer import Mailer
 from .base_operator import BaseOperator
-from global_vars import gv
+from globals import gv
 
 
 class DistributeKeytabOperator(BaseOperator):
