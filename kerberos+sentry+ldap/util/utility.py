@@ -19,4 +19,7 @@ class Utility():
 
     @staticmethod
     def rm(path):
-        shutil.rmtree(path)
+        try:
+            shutil.rmtree(path)
+        except OSError as e:
+            print(e)

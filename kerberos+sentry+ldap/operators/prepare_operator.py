@@ -3,11 +3,18 @@
 import ldap
 import re
 import subprocess
+from ruamel.yaml import YAML
 from .base_operator import BaseOperator
 from globals import gv
 
 
 class PrepareOperator(BaseOperator):
+
+    # 'uid=1001(lile) gid=1002(g_dev) groups=1002(g_dev),1004(g_etl)'
+    id_name_pattern = r'\d+\((\w+)\)'
+    re_id_name = re.compile(id_name_pattern)
+    re_primary_group = re.compile(r'gid=' + id_name_pattern)
+    re_supplementary_groups = re.compile(r'groups=([\w\(\)\,]+)')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,7 +29,9 @@ class PrepareOperator(BaseOperator):
         self.unbind_ldap()
 
         gv.logger.info('get cluster host precense user and group info ...')
-        self.get_node_user_group()
+        self.get_present_user_and_group()
+        self.get_diff_betwee_present_and_yaml()
+        self.output_conf()
 
     def bind_ldap(self):
         ldap_conf = gv.conf['ldap']
@@ -53,7 +62,7 @@ class PrepareOperator(BaseOperator):
             user_ids.append(user_id)
         gv.conf['group']['primary_mode']['g_dev']['member'] = user_ids
 
-    def get_node_user_group(self):
+    def get_present_user_and_group(self):
         result = subprocess.check_output("grep g_ /etc/group | awk -F: '{print $1}'", shell=True)
         groups = result.decode().split('\n')[0:-1]
         group_users = {}
@@ -64,3 +73,83 @@ class PrepareOperator(BaseOperator):
             group_users[g]['member'] = list(map(lambda x: re.sub('^\s+', '', x), users))
 
         gv.conf['present_group'] = group_users
+
+    def get_user_info(self, user):
+        # uid=1001(lile) gid=1002(g_dev) groups=1002(g_dev),1004(g_etl)
+        result = subprocess.check_output('id {user}'.format(user=user), shell=True)
+        result = result.decode('utf-8')
+        m_primary = self.re_primary_group.search(result)
+        m_supplementary = self.re_supplementary_groups.search(result)
+        primary = m_primary.group(1)
+        supplementary_part = m_supplementary.group(1)
+        supplementary = self.re_id_name.findall(supplementary_part)
+        return {
+            'primary': primary,
+            'supplementary': supplementary
+        }
+
+    def get_diffview_present_user_and_group(self):
+        present = gv.conf['present_group']
+        present_group_set = set(present)
+        present_users = []
+        for g, g_data in present.items():
+            present_users += g_data['member']
+        present_user_set = set(present_users)
+
+        d_present_user = {}
+        for username in present_user_set:
+            d_present_user[username] = self.get_user_info(username)
+        return {
+            'group': dict.fromkeys(present_group_set, 1),
+            'user':  d_present_user
+        }
+
+    def get_diffview_yaml_user_and_group(self):
+        yaml_ = gv.conf['group']
+        yaml_groups = {}
+        d_yaml_user = {}
+        for mode in yaml_:
+            for g_name, g in yaml_[mode].items():
+                yaml_groups[g_name] = 1
+                for u_name in g['member']:
+                    if d_yaml_user.get(u_name) is None:
+                        d_yaml_user[u_name] = {
+                            'primary': '',
+                            'supplementary': []
+                        }
+                    if mode == 'primary_mode':
+                        d_yaml_user[u_name]['primary'] = g_name
+                    else:
+                        d_yaml_user[u_name]['supplementary'].append(g_name)
+        return {
+            'group': yaml_groups,
+            'user': d_yaml_user
+        }
+
+    def get_diff_betwee_present_and_yaml(self):
+        present = self.get_diffview_present_user_and_group()
+        yaml_ = self.get_diffview_yaml_user_and_group()
+        diff = {
+            'group': {
+                'del': set(present['group']) - set(yaml_['group']),
+                'add': set(yaml_['group']) - set(present['group']),
+                'intersection': set(yaml_['group']) & set(present['group']),
+                'union': set(yaml_['group']) | set(present['group'])
+            },
+            'user': {
+                'del': set(present['user']) - set(yaml_['user']),
+                'add': set(yaml_['user']) - set(present['user']),
+                'intersection': set(yaml_['user']) & set(present['user']),
+                'union': set(yaml_['user']) | set(present['user'])
+            }
+        }
+        gv.conf['present_and_yaml_diff'] = diff
+        gv.conf['yaml'] = yaml_
+        gv.conf['present'] = present
+
+    def output_conf(self):
+        file = gv.conf['runtime']['conf']
+        gv.util.mkdir_p(file)
+        f = open(file, 'w')
+        YAML().dump(gv.conf, f)
+        f.close()
