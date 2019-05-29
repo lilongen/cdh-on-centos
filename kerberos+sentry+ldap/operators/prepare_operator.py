@@ -9,7 +9,17 @@ from globals import gv
 
 
 class PrepareOperator(BaseOperator):
-    # 'uid=1001(lile) gid=1002(g_dev) groups=1002(g_dev),1004(g_etl)'
+    """
+    this operator main do followings:
+
+    1. get all valid ldap user by filter and assign to conf[group][primary_mode][g_dev][member]
+    2. all primary_mode groups members as the base user set, to valid user in supplementary group member
+    3. get node os present user and group info
+    4. construct diff.view (present) and (yaml definition) user and group data
+    5. get user and group diff between present and yaml definition
+    """
+
+    # uid=1001(lile) gid=1002(g_dev) groups=1002(g_dev),1004(g_etl)
     id_name_pattern = r'\d+\((\w+)\)'
     re_id_name = re.compile(id_name_pattern)
     re_primary_group = re.compile(r'gid=' + id_name_pattern)
