@@ -46,7 +46,7 @@ class AnsibleOperator(BaseOperator):
                     'state': 'absent'
                 }
             })
-        for g_name in diff['group']['union']:
+        for g_name in diff['group']['intersection'] | diff['group']['add']:
             tasks.append({
                 'name': 'Ensure group "{}" exists'.format(g_name),
                 'group': {
@@ -67,7 +67,7 @@ class AnsibleOperator(BaseOperator):
                     }
                 })
 
-        for u in diff['user']['union']:
+        for u in diff['user']['intersection'] | diff['user']['add']:
             yaml_user = gv.conf['yaml']['user'][u]
             user_primary_group = yaml_user['primary']
             user_supplementary_groups = yaml_user['supplementary']

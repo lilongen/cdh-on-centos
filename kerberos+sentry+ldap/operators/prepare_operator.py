@@ -9,7 +9,6 @@ from globals import gv
 
 
 class PrepareOperator(BaseOperator):
-
     # 'uid=1001(lile) gid=1002(g_dev) groups=1002(g_dev),1004(g_etl)'
     id_name_pattern = r'\d+\((\w+)\)'
     re_id_name = re.compile(id_name_pattern)
@@ -27,6 +26,7 @@ class PrepareOperator(BaseOperator):
         self.bind_ldap()
         self.get_ldap_users()
         self.unbind_ldap()
+        self.valid_user_in_supplementary_group()
 
         gv.logger.info('get cluster host precense user and group info ...')
         self.get_present_user_and_group()
@@ -45,7 +45,8 @@ class PrepareOperator(BaseOperator):
         gv.logger.info('get AD/ldap group users ...')
         ldap_conf = gv.conf['ldap']
         re_1st_ou = re.compile(r'CN=[^,]+,OU=([^,]+),')
-        search_res = self.ldap_obj.search(ldap_conf['base_dn'], ldap.SCOPE_SUBTREE, ldap_conf['filter'], ldap_conf['attrs'])
+        search_res = self.ldap_obj.search(ldap_conf['base_dn'], ldap.SCOPE_SUBTREE, ldap_conf['filter'],
+                                          ldap_conf['attrs'])
         users = []
         while True:
             result_type, result_data = self.ldap_obj.result(search_res, 0)
@@ -54,13 +55,21 @@ class PrepareOperator(BaseOperator):
             result_type == ldap.RES_SEARCH_ENTRY and users.append(result_data)
 
         user_ids = []
-
         for entry in users:
             user_dn = entry[0][0]
             user_id = entry[0][1]['sAMAccountName'][0].decode()
             user_1stou = re.match(re_1st_ou, user_dn).group(1)
             user_ids.append(user_id)
         gv.conf['group']['primary_mode']['g_dev']['member'] = user_ids
+
+    def valid_user_in_supplementary_group(self):
+        valid_user = []
+        for g_name, g in gv.conf['group']['primary_mode'].items():
+            valid_user += g['member']
+
+        valid_user_set = set(valid_user)
+        for g_name, g in gv.conf['group']['supplementary_mode'].items():
+            g['member'] = list(set(g['member']) & valid_user_set)
 
     def get_present_user_and_group(self):
         result = subprocess.check_output("grep g_ /etc/group | awk -F: '{print $1}'", shell=True)
@@ -101,7 +110,7 @@ class PrepareOperator(BaseOperator):
             d_present_user[username] = self.get_user_info(username)
         return {
             'group': dict.fromkeys(present_group_set, 1),
-            'user':  d_present_user
+            'user': d_present_user
         }
 
     def get_diffview_yaml_user_and_group(self):
