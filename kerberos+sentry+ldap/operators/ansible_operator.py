@@ -73,6 +73,10 @@ class AnsibleOperator(BaseOperator):
             user_supplementary_groups = yaml_user['supplementary']
             os_home = gv.conf['group']['primary_mode'][user_primary_group]['os_home']
             home = '{os_home}/{user}'.format(os_home=os_home, user=u)
+            try:
+                user_supplementary_groups = user_supplementary_groups.remove(user_primary_group)
+            except Exception as e:
+                pass
             entry = {
                 'name': 'Ensure user "{}" exist, and belong to group "{}"'.format(u, user_primary_group),
                 'user': {
@@ -173,7 +177,7 @@ class AnsibleOperator(BaseOperator):
     def play_playbook_remove_then_recreate(self):
         self.play_playbook(gv.conf['ansible']['todo'])
 
-    def play_playbook_apply_diff(self):
+    def play_playbook_diff(self):
         self.play_playbook(gv.conf['ansible']['todo_diff'])
 
     def play_playbook(self, playbook):
