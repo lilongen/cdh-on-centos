@@ -71,12 +71,9 @@ class AnsibleOperator(BaseOperator):
             yaml_user = gv.conf['yaml']['user'][u]
             user_primary_group = yaml_user['primary']
             user_supplementary_groups = yaml_user['supplementary']
+            user_supplementary_groups = gv.util.list_remove_item(user_supplementary_groups, user_primary_group)
             os_home = gv.conf['group']['primary_mode'][user_primary_group]['os_home']
             home = '{os_home}/{user}'.format(os_home=os_home, user=u)
-            try:
-                user_supplementary_groups = user_supplementary_groups.remove(user_primary_group)
-            except Exception as e:
-                pass
             entry = {
                 'name': 'Ensure user "{}" exist, and belong to group "{}"'.format(u, user_primary_group),
                 'user': {

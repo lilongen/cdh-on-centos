@@ -23,3 +23,10 @@ class Utility():
             shutil.rmtree(path)
         except OSError as e:
             print(e)
+
+    @staticmethod
+    def list_remove_item(l, item):
+        try:
+            return l.remove(item)
+        except Exception as e:
+            return l
