@@ -1,6 +1,5 @@
 # coding: utf-8
 
-from ruamel.yaml import YAML
 import subprocess
 from .base_operator import BaseOperator
 from globals import gv

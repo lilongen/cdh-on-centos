@@ -3,7 +3,6 @@
 import ldap
 import re
 import subprocess
-from ruamel.yaml import YAML
 from .base_operator import BaseOperator
 from globals import gv
 

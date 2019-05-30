@@ -1,7 +1,6 @@
 # coding: utf-8
 
 from abc import ABCMeta, abstractmethod
-from globals import gv
 
 
 class BaseOperator(object, metaclass=ABCMeta):
