@@ -40,7 +40,7 @@ class PrepareOperator(BaseOperator):
 
         gv.logger.info('get cluster host precense user and group info ...')
         self.get_present_user_and_group()
-        self.get_diff_betwee_present_and_yaml()
+        self.get_diff_between_present_and_yaml()
         self.output_conf()
 
     def bind_ldap(self):
@@ -145,7 +145,7 @@ class PrepareOperator(BaseOperator):
             'user': d_yaml_user
         }
 
-    def get_diff_betwee_present_and_yaml(self):
+    def get_diff_between_present_and_yaml(self):
         present = self.get_diffview_present_user_and_group()
         yaml_ = self.get_diffview_yaml_user_and_group()
         diff = {
@@ -167,8 +167,4 @@ class PrepareOperator(BaseOperator):
         gv.conf['present'] = present
 
     def output_conf(self):
-        file = gv.conf['runtime']['conf']
-        gv.util.mkdir_p(file)
-        f = open(file, 'w')
-        YAML().dump(gv.conf, f)
-        f.close()
+        gv.util.dump_yaml_to_file(gv.conf, gv.conf['runtime']['conf'])

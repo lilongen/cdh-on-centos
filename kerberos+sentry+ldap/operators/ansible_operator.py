@@ -167,9 +167,7 @@ class AnsibleOperator(BaseOperator):
             'user': 'root',
             'tasks': tasks
         }]
-        gv.util.mkdir_p(file)
-        with open(file, 'w') as f:
-            YAML().dump(playbook, f)
+        gv.util.dump_yaml_to_file(playbook, file)
 
     def play_playbook_remove_then_recreate(self):
         self.play_playbook(gv.conf['ansible']['todo'])

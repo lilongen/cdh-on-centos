@@ -1,6 +1,7 @@
 import os
 import errno
 import shutil
+from ruamel.yaml import YAML
 
 
 class Utility():
@@ -30,3 +31,10 @@ class Utility():
             return l.remove(item)
         except Exception as e:
             return l
+
+    @staticmethod
+    def dump_yaml_to_file(yaml_, file):
+        Utility.mkdir_p(file)
+        f = open(file, 'w')
+        YAML().dump(yaml_, f)
+        f.close()
