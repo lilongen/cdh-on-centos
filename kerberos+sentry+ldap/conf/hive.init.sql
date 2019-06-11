@@ -1,5 +1,8 @@
+-- https://www.cloudera.com/documentation/enterprise/5-15-x/topics/sg_hive_sql.html
+
 !connect jdbc:hive2://10.200.70.161:10000/;principal=hive/_HOST@UYDC.COM
 show databases;
+
 create role r_admin;
 grant all on server server1 to role r_admin;
 grant all on server server1 to role r_admin with grant option;
@@ -38,3 +41,10 @@ create table t1(f1 int);
 create table t2 (f1 int);
 insert into t1 values (1), (2), (3), (4), (5);
 insert into t2 values (1), (2), (3), (4), (5);
+
+-- more
+-- https://www.cloudera.com/documentation/enterprise/5-15-x/topics/sg_hive_sql.html
+show current roles;
+show role grant group hive;
+show grant role r_admin;
+show grant role r_etl on database yxt;
