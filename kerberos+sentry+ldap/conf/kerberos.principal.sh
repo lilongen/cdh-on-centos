@@ -1,10 +1,10 @@
-addprinc -pw lle hdfs
-ktadd -k ./output/kerberos/hdfs.keytab hdfs
-addprinc -pw lle hive
-ktadd -k ./output/kerberos/hive.keytab hive
-addprinc -pw lle impala
-ktadd -k ./output/kerberos/impala.keytab impala
-addprinc -pw lle hbase
-ktadd -k ./output/kerberos/hbase.keytab hbase
-addprinc -pw lle sentry
-ktadd -k ./output/kerberos/sentry.keytab sentry
+kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle hdfs
+kadmin -p root/admin -w $kadmin_pwd ktadd -k ./output/kerberos/hdfs.keytab hdfs
+kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle hive
+kadmin -p root/admin -w $kadmin_pwd ktadd -k ./output/kerberos/hive.keytab hive
+kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle impala
+kadmin -p root/admin -w $kadmin_pwd ktadd -k ./output/kerberos/impala.keytab impala
+kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle hbase
+kadmin -p root/admin -w $kadmin_pwd ktadd -k ./output/kerberos/hbase.keytab hbase
+kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle sentry
+kadmin -p root/admin -w $kadmin_pwd ktadd -k ./output/kerberos/sentry.keytab sentry
