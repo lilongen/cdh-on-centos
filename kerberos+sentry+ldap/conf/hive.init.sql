@@ -48,3 +48,21 @@ show current roles;
 show role grant group hive;
 show grant role r_admin;
 show grant role r_etl on database yxt;
+
+-- grant privileges to role r_dev
+grant select on database elearning to role r_dev;
+grant select on database test_db1 to role r_dev;
+grant select on database yxt_dirty, database yxt_gz  to role r_dev;
+grant select on database yxt_dirty to role r_dev;
+grant select on database yxt_gz to role r_dev;
+grant select on database yxt_orc to role r_dev;
+grant select on database yxt_parquet to role r_dev;
+
+-- grant privileges to role r_prod
+grant select on database elearning to role r_prod;
+grant select on database test_db1 to role r_prod;
+grant select on database yxt_dirty, database yxt_gz  to role r_prod;
+grant select on database yxt_dirty to role r_prod;
+grant select on database yxt_gz to role r_prod;
+grant select on database yxt_orc to role r_prod;
+grant select on database yxt_parquet to role r_prod;
