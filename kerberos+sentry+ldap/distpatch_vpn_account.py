@@ -77,12 +77,12 @@ def main():
     with open('{cwd}/conf/mail.vpn.account.tpl.yml'.format(**tpl_vars), 'r') as f_tpl:
         tpl = f_tpl.read()
 
-    vpn_account_key_crt_location = '/Users/lilongen/onedrive/new.vpn.account'
+    vpn_account_key_crt_location = '/Users/lilongen/onedrive/new.vpn.account/teams'
     os.chdir(vpn_account_key_crt_location)
     suzhou = ['lile', 'luoyw', 'baosy', 'liukl', 'tangzx', 'wangxt', 'jingwz', 'yujun', 'suxj', 'yangwb', 'yyc', 'maocy', 'xuxt']
     nanjing = ['liuzl', 'wanglj', 'guoqp', 'liuc', 'sunxf']
     users = suzhou + nanjing
-    users = ['lile']
+    users = ['hebj']
     for username in users:
         tpl_vars['name'] = username
         mail = YAML().load(Template(tpl).render(**tpl_vars))
