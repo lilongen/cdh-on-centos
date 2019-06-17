@@ -66,3 +66,26 @@ grant select on database yxt_dirty to role r_prod;
 grant select on database yxt_gz to role r_prod;
 grant select on database yxt_orc to role r_prod;
 grant select on database yxt_parquet to role r_prod;
+
+-- kylin integration
+ansible ydc -m shell -a 'groupadd g_kylin'
+ansible ydc -m shell -a 'mkdir /ws.kylin'
+ansible ydc -m shell -a 'adduser u_kylin -g g_kylin -d /ws.kylin'
+
+kinit -kt /cdh.kerberos.sentry/hdfs.keytab hdfs
+hdfs dfs -mkdir /ws.kylin
+hdfs dfs -chown -R u_kylin:g_kylin /ws.kylin
+
+beeline
+!connect jdbc:hive2://10.200.70.161:10000/;principal=hive/_HOST@UYDC.COM
+create role r_kylin;
+grant role r_kylin to group g_kylin;
+
+create database kylin;
+grant all on database kylin to role r_kylin;
+
+revoke all on database default from role r_kylin;
+revoke role r_kylin from group g_kylin;
+-- GRANT <Privilege> ON URIs (HDFS and S3A)
+grant all on uri 'hdfs://ydc-162:8020/ws.kylin' to role r_kylin;
+create external table ext_t1 (id int) location '/ws.kylin'
