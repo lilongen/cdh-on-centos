@@ -28,6 +28,8 @@ grant all on database yxt_dirty to role r_etl;
 grant all on database yxt_gz to role r_etl;
 grant all on database yxt_orc to role r_etl;
 grant all on database yxt_parquet to role r_etl;
+-- GRANT <Privilege> ON URIs (HDFS and S3A)
+grant all on uri 'hdfs://ydc-162:8020/ws.kylin' to role r_kylin;
 
 use default;
 create table t1 (f1 int);
