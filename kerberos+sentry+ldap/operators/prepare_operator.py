@@ -9,7 +9,7 @@ from globals import gv
 
 class PrepareOperator(BaseOperator):
     """
-    this operator main do followings:
+    this operator mainly do followings:
 
     1. get all valid ldap user by filter and assign to conf[group][primary_mode][g_dev][member]
     2. all primary_mode groups members as the base user set, to valid user in supplementary group member

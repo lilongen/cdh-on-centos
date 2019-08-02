@@ -28,3 +28,5 @@ revoke '@g_kylin', '@default'
 # Referenece
 https://www.tutorialspoint.com/hbase/hbase_security.htm
 https://www.cloudera.com/documentation/enterprise/latest/topics/sg_hive_sql.html#grant_privilege_on_uri
+
+grant all on database kylin to role r_prod;

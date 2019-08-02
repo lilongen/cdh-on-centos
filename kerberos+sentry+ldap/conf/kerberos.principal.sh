@@ -10,3 +10,5 @@ kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle sentry
 kadmin -p root/admin -w $kadmin_pwd ktadd -k ./output/kerberos/sentry.keytab sentry
 kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle u_kylin
 kadmin -p root/admin -w $kadmin_pwd ktadd -k ./output/kerberos/u_kylin.keytab u_kylin
+kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle HTTP
+kadmin -p root/admin -w $kadmin_pwd ktadd -k /tmp/HTTP.keytab HTTP

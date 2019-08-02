@@ -91,3 +91,32 @@ revoke role r_kylin from group g_kylin;
 -- GRANT <Privilege> ON URIs (HDFS and S3A)
 grant all on uri 'hdfs://ydc-162:8020/ws.kylin' to role r_kylin;
 create external table ext_t1 (id int) location '/ws.kylin'
+
+
+-- 后续一些库的设置
+alter database eschool1 set owner user hive;
+describe database eschool1;
+
+create database eschool1;
+create database elcustom;
+create database elearning_delete;
+create database elearning_elcustom;
+create database elearning_incremental;
+create database elearning_reconcile;
+create database precomputation;
+
+grant all on database eschool1 to role r_etl;
+grant all on database elcustom to role r_etl;
+grant all on database elearning_delete to role r_etl;
+grant all on database elearning_elcustom to role r_etl;
+grant all on database elearning_incremental to role r_etl;
+grant all on database elearning_reconcile to role r_etl;
+grant all on database precomputation to role r_etl;
+
+grant select on database eschool1 to role r_dev;
+grant select on database elcustom to role r_dev;
+grant select on database elearning_delete to role r_dev;
+grant select on database elearning_elcustom to role r_dev;
+grant select on database elearning_incremental to role r_dev;
+grant select on database elearning_reconcile to role r_dev;
+grant select on database precomputation to role r_dev;
