@@ -8,6 +8,7 @@ ldap:
 
   filter: (&(objectCategory=person)(objectClass=user)(memberOf=cn=BDAI,OU=组,dc=domain,dc=corporation_name))
   attrs: [sAMAccountName, mail, mobile]
+  # attrs: ['*']
 
 group:
   primary_mode:

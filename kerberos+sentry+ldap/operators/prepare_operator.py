@@ -54,15 +54,14 @@ class PrepareOperator(BaseOperator):
         gv.logger.info('get AD/ldap group users ...')
         ldap_conf = gv.conf['ldap']
         re_1st_ou = re.compile(r'CN=[^,]+,OU=([^,]+),')
-        search_res = self.ldap_obj.search(ldap_conf['base_dn'], ldap.SCOPE_SUBTREE, ldap_conf['filter'],
-                                          ldap_conf['attrs'])
+        search_res = self.ldap_obj.search(ldap_conf['base_dn'], ldap.SCOPE_SUBTREE, ldap_conf['filter'], ldap_conf['attrs'])
         users = []
         while True:
             result_type, result_data = self.ldap_obj.result(search_res, 0)
             if (len(result_data) == 0):
                 break
             result_type == ldap.RES_SEARCH_ENTRY and users.append(result_data)
-
+        gv.logger.info(users)
         user_ids = []
         for entry in users:
             user_dn = entry[0][0]
