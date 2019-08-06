@@ -62,6 +62,7 @@ class PrepareOperator(BaseOperator):
                 break
             result_type == ldap.RES_SEARCH_ENTRY and users.append(result_data)
         gv.logger.info(users)
+        
         user_ids = []
         for entry in users:
             user_dn = entry[0][0]
