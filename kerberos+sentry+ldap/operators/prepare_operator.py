@@ -60,9 +60,10 @@ class PrepareOperator(BaseOperator):
             result_type, result_data = self.ldap_obj.result(search_res, 0)
             if (len(result_data) == 0):
                 break
-            result_type == ldap.RES_SEARCH_ENTRY and users.append(result_data)
-        gv.logger.info(users)
-        
+            if result_type == ldap.RES_SEARCH_ENTRY:
+                users.append(result_data)
+                gv.logger.info(result_data)
+
         user_ids = []
         for entry in users:
             user_dn = entry[0][0]
