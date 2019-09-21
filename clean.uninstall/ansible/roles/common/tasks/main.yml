@@ -74,6 +74,9 @@
     # Run the following command on each data drive on all Agent hosts (adjust the paths for the data drives on each host):
     rm -Rf /sdb/dfs /sdb/mapred /sdb/yarn /sdb/impala
 
+    # clean hdfs namenode, secondnamenode metadata directory
+    rm -Rf /dfs
+
     pkill -9 -f /usr/lib64/cmf/
 
     pkill -9 -f scm_prepare_node
