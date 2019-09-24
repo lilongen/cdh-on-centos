@@ -1,10 +1,15 @@
-hbase shell
-status
-version
-whoami
-table_help
+https://www.guru99.com/hbase-shell-general-commands.html
 
-table management
+hbase shell usage
+
+### General commands
+    Status
+    Version
+    Table_help ( scan, drop, get, put, disable, etc.)
+    Whoami
+
+
+### Tables Managements commands
     Create
     List
     Describe
@@ -18,3 +23,29 @@ table management
     Alter
     Alter_status
 
+### Data manipulation commands
+    Count
+    Put
+    Get
+    Delete
+    Delete all
+    Truncate
+    Scan
+
+### Cluster Replication Commands
+    These commands work on cluster set up mode of HBase.
+    For adding and removing peers to cluster and to start and stop replication these commands are used in general.
+Command
+Functionality
+
+Add peers to cluster to replicate
+hbase> add_peer '3', zk1,zk2,zk3:2182:/hbase-prod
+
+Deletes all the metadata information about the peer
+hbase> remove_peer '1'
+
+Restarts all the replication features
+hbase> start_replication
+
+Stops all the replication features
+hbase>stop_replication
