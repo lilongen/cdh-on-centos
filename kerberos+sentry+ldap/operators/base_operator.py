@@ -17,7 +17,7 @@ class BaseOperator(object, metaclass=ABCMeta):
             return callable_(self, *args, **kwargs)
         return wrapper
 
-    def cancel_if_error(callable_):
+    def cancel_on_error(callable_):
         def wrapper(self, *args, **kwargs):
             if self.err == 0:
                 return callable_(self, *args, **kwargs)

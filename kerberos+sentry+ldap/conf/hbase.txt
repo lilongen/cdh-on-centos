@@ -8,7 +8,6 @@ hbase shell usage
     Table_help ( scan, drop, get, put, disable, etc.)
     Whoami
 
-
 ### Tables Managements commands
     Create
     List

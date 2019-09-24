@@ -10,7 +10,7 @@ class AnsibleOperator(BaseOperator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @BaseOperator.cancel_if_error
+    @BaseOperator.cancel_on_error
     def execute(self):
         gv.logger.info('AnsibleOperator ...')
         gv.logger.info('generate group, user, directory playbook ...')

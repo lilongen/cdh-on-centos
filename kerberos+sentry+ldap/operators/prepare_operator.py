@@ -28,7 +28,7 @@ class PrepareOperator(BaseOperator):
         super().__init__(*args, **kwargs)
         self.ldap_obj: object
 
-    @BaseOperator.cancel_if_error
+    @BaseOperator.cancel_on_error
     def execute(self):
         gv.logger.info('PrepareOperator ...')
         gv.logger.info('get valid AD user in specail group ...')

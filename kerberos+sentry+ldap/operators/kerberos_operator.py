@@ -10,7 +10,7 @@ class KerberosOperator(BaseOperator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @BaseOperator.cancel_if_error
+    @BaseOperator.cancel_on_error
     def execute(self):
         gv.logger.info('KerberosOperator ...')
         gv.logger.info('operate principle and generate keytab ...')
