@@ -1,10 +1,10 @@
-#!/usr/local/bin/bash
+#!/usr/bin/env bash
 
 declare -A path_appendix 
 path_appendix=( \
-    ["test"]="/opt/cloudera/parcels/CDH-6.3.0-1.cdh6.3.0.p0.1279813" \
-    ["dev"]="/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24" \
-    ["dev"]="/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24" \
+    ["test"]="/opt/cloudera/parcels/CDH-6.3.0-1.cdh6.3.0.p0.1279813/bin" \
+    ["dev"]="/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24/bin" \
+    ["dev"]="/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24/bin" \
 )
 
 declare -A spark_yarn_jar
@@ -28,13 +28,13 @@ hadoop_conf=( \
     ["prod"]="/opt/cloudera/hadoop.conf/prod" \
 )
 
-switch() {
+generate_exports() {
     to=$1
-    export HADOOP_CONF_DIR="${hadoop_conf[$to]}"
-    export SPARK_DIST_CLASSPATH==$(paste -sd: "${spark_dist_classpath[$to]}")
-    export PATH="${path_appendix[$to]}:$PATH"
-    export SPARK_YARN_JAR="${spark_yarn_jar[$to]}"
+    spark_dist_classpath="$(paste -sd: "${spark_dist_classpath[$to]}")"
+    echo export HADOOP_CONF_DIR=\"${hadoop_conf[$to]}\"
+    echo export PATH=\"${path_appendix[$to]}:$PATH\"
+    echo export SPARK_YARN_JAR=\"${spark_yarn_jar[$to]}\"
+    echo export SPARK_DIST_CLASSPATH=\"$spark_dist_classpath\"
 }
 
-switch $1
-env
+generate_exports $1

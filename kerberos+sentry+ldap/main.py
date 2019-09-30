@@ -46,27 +46,43 @@ def get_conf():
     return YAML().load(template.render(**gv.tpl_vars))
 
 
-@click.command()
-@click.option('-d', '--dryrun', 'dryrun', type=bool, default=True, required=False)
-@click.option('-f', '--filter', 'filter', type=str, default='*', required=False)
-def main(dryrun, filter):
-    print('init app ...')
-
-    init_ns(dryrun)
-
-    clean()
-    enabled_operators = ['PrepareOperator'] + filter.split(',')
-
-    operators = (
+def get_enabled_operators(include, exclude):
+    operators = [
         'PrepareOperator',
         'AnsibleOperator',
         'HdfsOperator',
         'KerberosOperator',
-        'DistributeKeytabOperator',
-    )
+        'DistributeKeytabOperator'
+    ]
+    base = ['PrepareOperator']
+    if include == '*':
+        i = operators
+    else:
+        i = include.split(',')
+
+    if exclude == '*':
+        x = operators
+    else:
+        x = exclude.split(',')
+
+    enabled =  set(base) | (set(i) - set(x))
+    return list(filter(lambda i: i in enabled, operators))
+
+
+@click.command()
+@click.option('-d', '--dryrun', 'dryrun', type=bool, default=True, required=False)
+@click.option('-i', '--include', 'include', type=str, default='*', required=False)
+@click.option('-x', '--exclude', 'exclude', type=str, default='', required=False)
+def main(dryrun, include, exclude):
+    print('init app ...')
+
+    init_ns(dryrun)
+    clean()
+
+    operators = get_enabled_operators(include, exclude)
+    print(operators)
     for name in operators:
-        if '*' in filter or name in enabled_operators:
-            globals()[name]().execute()
+        globals()[name]().execute()
 
 
 if __name__ == "__main__":
