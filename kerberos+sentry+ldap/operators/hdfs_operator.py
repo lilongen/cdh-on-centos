@@ -25,9 +25,18 @@ class HdfsOperator(BaseOperator):
             for g_name, g in gv.conf['group'][group_mode].items():
                 if g.get('hdfs_home') is None:
                     continue
-                cmds.append('hdfs dfs -mkdir -p {}'.format(g['hdfs_home']))
-                cmds.append('hdfs dfs -chgrp -R {} {}'.format(g_name, g['hdfs_home']))
-                cmds.append('hdfs dfs -chmod -R g+w {}'.format(g['hdfs_home']))
+                cmds.append('hdfs dfs -mkdir -p {home}'.format(home=g['hdfs_home']))
+                cmds.append('hdfs dfs -chgrp -R {group} {home}'.format(group=g_name, home=g['hdfs_home']))
+                cmds.append('hdfs dfs -chmod -R g-w {home}'.format(home=g['hdfs_home']))
+
+                if group_mode != 'primary_mode':
+                    continue
+                for user in g['member']:
+                    user_dirs = ['{home}/{user}'.format(home=g['hdfs_home'], user=user), '/user/{user}'.format(user=user)]
+                    for dir in user_dirs:
+                        cmds.append('hdfs dfs -mkdir -p {user_home}'.format(user_home=dir))
+                        cmds.append('hdfs dfs -chown {user} {user_home}'.format(user=user, user_home=dir))
+                        cmds.append('hdfs dfs -chgrp -R {group} {user_home}'.format(group=g_name, user_home=dir))
 
         gv.util.mkdir_p(gv.conf['hdfs']['todo'])
         sh = gv.conf['hdfs']['todo']
