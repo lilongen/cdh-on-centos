@@ -65,7 +65,7 @@ def get_enabled_operators(include, exclude):
     else:
         x = exclude.split(',')
 
-    enabled =  set(base) | (set(i) - set(x))
+    enabled = set(base) | (set(i) - set(x))
     return list(filter(lambda i: i in enabled, operators))
 
 
@@ -79,9 +79,7 @@ def main(dryrun, include, exclude):
     init_ns(dryrun)
     clean()
 
-    operators = get_enabled_operators(include, exclude)
-    print(operators)
-    for name in operators:
+    for name in get_enabled_operators(include, exclude):
         globals()[name]().execute()
 
 
