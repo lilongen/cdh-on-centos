@@ -6,6 +6,7 @@ to=$1
 spark_dist_classpath_file="/opt/cloudera/spark.dist.classpath/${to}/classpath.txt"
 spark_defaults_file="/opt/cloudera/spark.defaults/${to}/spark-defaults.conf"
 hadoop_conf_dir="/opt/cloudera/hadoop.conf/${to}"
+krb5_conf_file="/opt/cloudera/krb5/${to}/krb5.conf"
 
 declare -A cdh_parcels 
 cdh_parcels=( \
@@ -31,12 +32,19 @@ echo_inject_jvmd_krb5conf_to_spark_submit() {
 echo_env_exports() {
     spark_dist_classpath="$(paste -sd: ${spark_dist_classpath_file})"
     spark_yarn_jar=$(grep spark.yarn.jar ${spark_defaults_file} | awk -F'=' '{print $2}')
-    krb5_conf_file="/opt/cloudera/krb5/${to}/krb5.conf"
     echo export HADOOP_CONF_DIR=\"${hadoop_conf_dir}\"
     echo export PATH=\"${cdh_parcel}/bin:$PATH\"
-    echo export SPARK_DEFAULTS=\"${spark_defaults_file}\"
-    echo export SPARK_YARN_JAR=\"$spark_yarn_jar\"
     echo export SPARK_DIST_CLASSPATH=\"$spark_dist_classpath\"
+    
+    # spark-submit ... --properties-file ${SPARK_DEFAULTS} ...
+    echo export SPARK_DEFAULTS=\"${spark_defaults_file}\"
+    
+    # spark-submit ... --conf "spark.yarn.jars=${SPARK_YARN_JAR}" ...
+    # it's not required if above "--properties-file" set
+    echo export SPARK_YARN_JAR=\"$spark_yarn_jar\"
+    
+    # does not use /etc/krb5.conf directly, 
+    # to bring the ability that different bash session can simultaneously run spark jobs target to different CDH cluster
     echo export KRB5_CONFIG=\"${krb5_conf_file}\"
     
     # Why need JVM_D_JAVA_SECURITY_KRB5_CONF? 
