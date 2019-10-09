@@ -24,7 +24,8 @@ echo_ln_cdh() {
 # 3. ${JVM_D_JAVA_SECURITY_KRB5_CONF} export in echo_env_exports 
 echo_inject_jvmd_krb5conf_to_spark_submit() {
     spark_submit_file="${cdh_parcel}/lib/spark/bin/spark-submit"
-    echo "perl -i -pE 's|(/bin/spark-class).+(org.apache.spark.deploy.SparkSubmit)|\${1} \\\${JVM_D_JAVA_SECURITY_KRB5_CONF} \${2}|m' $spark_submit_file"
+    echo "grep JVM_D_JAVA_SECURITY_KRB5_CONF ${spark_submit_file} &>/dev/null \
+        || perl -i -pE 's|(/bin/spark-class).+(org.apache.spark.deploy.SparkSubmit)|\${1} \\\${JVM_D_JAVA_SECURITY_KRB5_CONF} \${2}|m' ${spark_submit_file}"
 }
 
 echo_env_exports() {
