@@ -47,7 +47,7 @@ def generate_rsync_cmds():
             Cmds.append(f'rsync -avp root@{host}:{src} {dest}/{env}/')
         for parcel in info['parcels']:
             Cmds.append(f'test -d /opt/cloudera/parcels/{parcel} || rsync -avp root@{host}:/opt/cloudera/parcels/{parcel} /opt/cloudera/parcels/')
-            
+
         Cmds.append('')
 
 
