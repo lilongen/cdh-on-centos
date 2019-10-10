@@ -17,7 +17,11 @@ cdh_parcels=( \
 cdh_parcel=${cdh_parcels[$to]}
 
 echo_ln_cdh() {
-    echo ln -sf ${cdh_parcel} /opt/cloudera/parcels/CDH
+    echo sudo ln -sf ${cdh_parcel} /opt/cloudera/parcels/CDH
+}
+
+echo_ln_krb5_conf() {
+    echo sudo ln -sf ${krb5_conf_file} /etc/krb5.conf
 }
 
 # 1. set JVM_D_JAVA_SECURITY_KRB5_CONF=-Djava.security.krb5.conf=/path/to/krb5.conf
@@ -32,9 +36,10 @@ echo_inject_jvmd_krb5conf_to_spark_submit() {
 echo_env_exports() {
     spark_dist_classpath="$(paste -sd: ${spark_dist_classpath_file})"
     spark_yarn_jar=$(grep spark.yarn.jar ${spark_defaults_file} | awk -F'=' '{print $2}')
-    echo export HADOOP_CONF_DIR=\"${hadoop_conf_dir}\"
-    echo export PATH=\"${cdh_parcel}/bin:$PATH\"
+    
     echo export SPARK_DIST_CLASSPATH=\"$spark_dist_classpath\"
+    echo export PATH=\"${cdh_parcel}/bin:$PATH\"
+    echo export HADOOP_CONF_DIR=\"${hadoop_conf_dir}\"
     
     # spark-submit ... --properties-file ${SPARK_DEFAULTS} ...
     echo export SPARK_DEFAULTS=\"${spark_defaults_file}\"
@@ -47,10 +52,11 @@ echo_env_exports() {
     # to bring the ability that different bash session can simultaneously run spark jobs target to different CDH cluster
     echo export KRB5_CONFIG=\"${krb5_conf_file}\"
     
-    # Why need JVM_D_JAVA_SECURITY_KRB5_CONF? 
-    # 1). spark-submit, can not using environment variable KRB5_CONFIG
-    # 2). spark-submit -> java ...
-    # 3). append -Djava.security.krb5.conf=/path/to/krb5.conf into spark-submit command
+    # Why need JVM_D_JAVA_SECURITY_KRB5_CONF?
+    # 1). if /etc/krb5.conf not exists, and KRB5_CONFIG is set
+    # 2). spark-submit, can not using environment variable KRB5_CONFIG
+    # 3). spark-submit -> java ...
+    # 4). append -Djava.security.krb5.conf=/path/to/krb5.conf into spark-submit command
     echo export JVM_D_JAVA_SECURITY_KRB5_CONF=\"-Djava.security.krb5.conf=${krb5_conf_file}\"
 }
 
@@ -59,10 +65,11 @@ echo_kinit() {
 }
 
 main() {
-#    echo_ln_cdh
     echo_env_exports
-    echo_inject_jvmd_krb5conf_to_spark_submit
+    echo_ln_cdh
+    echo_ln_krb5_conf
     echo_kinit
+    # echo_inject_jvmd_krb5conf_to_spark_submit
 }
 
 main
