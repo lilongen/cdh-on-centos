@@ -2,15 +2,6 @@
 # coding: utf-8
 #
 
-envs='{test,dev,prod}'
-Local_Paths =  [
-    f'/opt/cloudera/parcels',
-    f'/opt/cloudera/spark.dist.classpath/{envs}',
-    f'/opt/cloudera/spark.defaults/{envs}',
-    f'/opt/cloudera/hadoop.conf/{envs}',
-    f'/opt/cloudera/krb5/{envs}',
-    f'/opt/cloudera/keytab/{envs}'
-]
 Env = {
     'test': {
         'host': '10.200.70.103',
@@ -25,6 +16,15 @@ Env = {
         'parcels': ['CDH-5.14.0-1.cdh5.14.0.p0.24', 'GPLEXTRAS-5.14.0-1.cdh5.14.0.p0.22']
     }
 }
+envs = '{%s}' % ','.join(list(Env.keys()))
+Local_Paths =  [
+    f'/opt/cloudera/parcels',
+    f'/opt/cloudera/spark.dist.classpath/{envs}',
+    f'/opt/cloudera/spark.defaults/{envs}',
+    f'/opt/cloudera/hadoop.conf/{envs}',
+    f'/opt/cloudera/krb5/{envs}',
+    f'/opt/cloudera/keytab/{envs}'
+]
 Sync = {
     '/etc/spark/conf/classpath.txt': '/opt/cloudera/spark.dist.classpath',
     '/etc/spark/conf/spark-defaults.conf': '/opt/cloudera/spark.defaults',
