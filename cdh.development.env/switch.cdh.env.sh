@@ -52,11 +52,11 @@ echo_env_exports() {
     # to bring the ability that different bash session can simultaneously run spark jobs target to different CDH cluster
     echo export KRB5_CONFIG=\"${krb5_conf_file}\"
     
-    # Why need JVM_D_JAVA_SECURITY_KRB5_CONF?
-    # 1). if /etc/krb5.conf not exists, and KRB5_CONFIG is set
-    # 2). spark-submit, can not using environment variable KRB5_CONFIG
-    # 3). spark-submit -> java ...
-    # 4). append -Djava.security.krb5.conf=/path/to/krb5.conf into spark-submit command
+    # Why set JVM_D_JAVA_SECURITY_KRB5_CONF?
+    # . if /etc/krb5.conf not exists, and KRB5_CONFIG is set
+    # . spark-submit, can not using environment variable KRB5_CONFIG
+    # . spark-submit -> java ...
+    # . append -Djava.security.krb5.conf=/path/to/krb5.conf into spark-submit command
     echo export JVM_D_JAVA_SECURITY_KRB5_CONF=\"-Djava.security.krb5.conf=${krb5_conf_file}\"
 }
 
