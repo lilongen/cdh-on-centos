@@ -34,10 +34,14 @@ Sync = {
 Cmds = []
 
 
+def add_separator():
+    Cmds.append('')
+
+
 def generate_mkdir_cmd():
     for path in Local_Paths:
         Cmds.append(f'mkdir -p {path}')
-    Cmds.append('')
+    add_separator()
 
 
 def generate_rsync_cmds():
@@ -47,8 +51,8 @@ def generate_rsync_cmds():
             Cmds.append(f'rsync -avp root@{host}:{src} {dest}/{env}/')
         for parcel in info['parcels']:
             Cmds.append(f'test -d /opt/cloudera/parcels/{parcel} || rsync -avp root@{host}:/opt/cloudera/parcels/{parcel} /opt/cloudera/parcels/')
-
-        Cmds.append('')
+        
+        add_separator()
 
 
 def ouput_cmds():
