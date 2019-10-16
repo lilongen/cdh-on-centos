@@ -37,8 +37,11 @@ echo_env_exports() {
     spark_dist_classpath="$(paste -sd: ${spark_dist_classpath_file})"
     spark_yarn_jar=$(grep spark.yarn.jar ${spark_defaults_file} | awk -F'=' '{print $2}')
     
+    # remove existed CDH parcels bin path
+    path_without_cdhbin=$(echo $PATH | perl -pE 's|/opt/cloudera/parcels/CDH[^:]*:||g')
+
     echo export SPARK_DIST_CLASSPATH=\"$spark_dist_classpath\"
-    echo export PATH=\"${cdh_parcel}/bin:$PATH\"
+    echo export PATH=\"${cdh_parcel}/bin:${path_without_cdhbin}\"
     echo export HADOOP_CONF_DIR=\"${hadoop_conf_dir}\"
     
     # spark-submit ... --properties-file ${SPARK_DEFAULTS} ...
