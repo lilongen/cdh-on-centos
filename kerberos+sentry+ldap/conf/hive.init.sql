@@ -3,8 +3,9 @@
 
 
 # CDH6.3 issue:
-# beeline connect: principal should use primary/exact_instance@REALM,
+# beeline connect: principal should use primary/instance@REALM, the instance should use an exact one, just like uydc-161, not _HOST
 # example hive/uydc-101@UYDC.COM, not hive/_HOST@UYDC.COM
+#
 !connect jdbc:hive2://10.200.70.161:10000/;principal=hive/ydc-161@UYDC.COM
 !connect jdbc:hive2://10.200.70.161:10000/;principal=hive/_HOST@UYDC.COM
 show databases;
