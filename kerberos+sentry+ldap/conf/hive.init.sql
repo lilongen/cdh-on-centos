@@ -1,5 +1,11 @@
 -- https://www.cloudera.com/documentation/enterprise/5-15-x/topics/sg_hive_sql.html
 
+
+
+# CDH6.3 issue:
+# beeline connect: principal should use primary/exact_instance@REALM,
+# example hive/uydc-101@UYDC.COM, not hive/_HOST@UYDC.COM
+!connect jdbc:hive2://10.200.70.161:10000/;principal=hive/ydc-161@UYDC.COM
 !connect jdbc:hive2://10.200.70.161:10000/;principal=hive/_HOST@UYDC.COM
 show databases;
 
