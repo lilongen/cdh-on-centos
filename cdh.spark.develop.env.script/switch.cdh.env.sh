@@ -16,13 +16,16 @@ cdh_parcels=( \
 )
 cdh_parcel=${cdh_parcels[$to]}
 
+
 echo_ln_cdh() {
     echo sudo ln -sf ${cdh_parcel} /opt/cloudera/parcels/CDH
 }
 
+
 echo_ln_krb5_conf() {
     echo sudo ln -sf ${krb5_conf_file} /etc/krb5.conf
 }
+
 
 # 1. set JVM_D_JAVA_SECURITY_KRB5_CONF=-Djava.security.krb5.conf=/path/to/krb5.conf
 # 2. inject ${JVM_D_JAVA_SECURITY_KRB5_CONF} into spark-submit shell
@@ -32,6 +35,7 @@ echo_inject_jvmd_krb5conf_to_spark_submit() {
     echo "grep JVM_D_JAVA_SECURITY_KRB5_CONF ${spark_submit_file} &>/dev/null \
         || perl -i -pE 's|(/bin/spark-class).+(org.apache.spark.deploy.SparkSubmit)|\${1} \\\${JVM_D_JAVA_SECURITY_KRB5_CONF} \${2}|m' ${spark_submit_file}"
 }
+
 
 echo_env_exports() {
     spark_dist_classpath="$(paste -sd: ${spark_dist_classpath_file})"
@@ -63,16 +67,30 @@ echo_env_exports() {
     echo export JVM_D_JAVA_SECURITY_KRB5_CONF=\"-Djava.security.krb5.conf=${krb5_conf_file}\"
 }
 
+
 echo_kinit() {
     echo kinit -kt /opt/cloudera/keytab/$to/lile.keytab lile
 }
 
+
+echo_ln_extra_spark_submits() {
+    spark22_prefix=/opt/cloudera/extra.spark/spark-2.2.0-bin-hadoop2.6
+    spark24_prefix=/opt/cloudera/extra.spark/spark-2.4.4-bin-hadoop2.6
+    echo alias spark-submit_22="${spark22_prefix}/bin/spark-submit"
+    echo alias spark-submit_24="${spark24_prefix}/bin/spark-submit"
+    echo export SPARK_YARN_JAR_22=\"local:${spark22_prefix}/jars/*\"
+    echo export SPARK_YARN_JAR_24=\"local:${spark24_prefix}/jars/*\"
+}
+
+
 main() {
     echo_env_exports
     echo_ln_cdh
+    echo_ln_extra_spark_submits
     echo_ln_krb5_conf
     echo_kinit
     # echo_inject_jvmd_krb5conf_to_spark_submit
 }
+
 
 main

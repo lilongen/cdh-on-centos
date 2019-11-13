@@ -1,7 +1,5 @@
 -- https://www.cloudera.com/documentation/enterprise/5-15-x/topics/sg_hive_sql.html
 
-
-
 # CDH6.3 issue:
 # beeline connect: principal should use primary/instance@REALM, the instance should use an exact one, just like uydc-161, not _HOST
 # example hive/uydc-101@UYDC.COM, not hive/_HOST@UYDC.COM
