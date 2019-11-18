@@ -56,28 +56,41 @@ class Mailer(object):
                               filename=('utf-8', '', file.split('/')[-1]))
             mail.attach(attach)
 
-    def assemble(self, mail: dict):
+    def assemble(self, mail_vars: dict):
         mime = MIMEMultipart()
-        puretext = MIMEText(mail['msg'], 'plain', 'utf-8')
-        mime.attach(puretext)
-        mime['Subject'] = Header(mail['subject'], 'utf-8').encode()
-        mime['To'] = mail['to']
+        mime_text = MIMEText(mail_vars['msg'], 'plain', 'utf-8')
+        mime.attach(mime_text)
+        mime['Subject'] = Header(mail_vars['subject'], 'utf-8').encode()
+        mime['To'] = mail_vars['to']
         mime['From'] = self.sender
-        if mail.get('from') is not None:
-            mime['From'] = mail['from']
+        if mail_vars.get('from') is not None:
+            mime['From'] = mail_vars['from']
 
-        files = mail.get('files')
+        files = mail_vars.get('files')
         if files is not None:
             self._append_attach(mime, files)
         return mime
 
-    def send(self, tolist: list, mail: dict):
+    def send(self, tolist: list, mail_vars: dict):
+        """
+        send mail to recipients
+        :param tolist: list of recipients
+        :param mail_vars: dictionary that includes mail "subject", "from", "msg"
+        :return:
+        """
         for to in tolist:
-            mail['to'] = to
-            self.smtp_cli.sendmail(self.sender, to, self.assemble(mail).as_string())
+            mail_vars['to'] = to
+            self.smtp_cli.sendmail(self.sender, to, self.assemble(mail_vars).as_string())
 
     def send_tpl(self, tolist, tpl_file, tpl_vars):
+        """
+        send mail that rendered from (tpl_file, tpl_vars) to recipients list
+        :param tolist: list of recipients
+        :param tpl_file: jinja2 template file that includes mail "subject", "from", "msg".
+        :param tpl_vars: template variables used in above template file - tpl_file
+        :return:
+        """
         with open(tpl_file, 'r') as f_tpl:
             tpl = f_tpl.read()
-        mail = YAML().load(Template(tpl).render(**tpl_vars))
-        self.send(tolist, mail)
+        mail_vars = YAML().load(Template(tpl).render(**tpl_vars))
+        self.send(tolist, mail_vars)
