@@ -7,7 +7,6 @@
     packages:
       - psmisc
       - "{{ pkg_cm_daemons }}"
-      - "{{ svc_cm_agent }}"
       - "{{ pkg_cm_server }}"
 
 - name: copy file, db init script
@@ -21,7 +20,7 @@
     executable: /bin/bash
 
 - name: execute {{ scm_prepare_database_sh }}
-  command: {{ scm_prepare_database_sh }} -h{{ mysql_host }} -u{{ mysql_user }} -p{{ mysql_password }} --scm-host {{ cm_host }} mysql cmf cmf Uydc.cmf
+  command: "{{ scm_prepare_database_sh }} -h{{ mysql_host }} -u{{ mysql_user }} -p{{ mysql_password }} --scm-host {{ cm_host }} mysql cmf cmf Uydc.cmf"
   notify:
     - echo uptime
 
