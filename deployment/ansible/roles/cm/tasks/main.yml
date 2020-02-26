@@ -5,9 +5,10 @@
     state: present
   vars:
     packages:
-      - "{{ pkg_cm_server }}"
-      - "{{ pkg_cm_daemons }}"
       - psmisc
+      - "{{ pkg_cm_daemons }}"
+      - "{{ svc_cm_agent }}"
+      - "{{ pkg_cm_server }}"
 
 - name: copy file, db init script
   copy:
@@ -19,8 +20,8 @@
   args:
     executable: /bin/bash
 
-- name: execute /usr/share/cmf/schema/scm_prepare_database.sh
-  command: /usr/share/cmf/schema/scm_prepare_database.sh -h{{ mysql_host }} -u{{ mysql_user }} -p{{ mysql_password }} --scm-host {{ cm_host }} mysql cmf cmf Uydc.cmf
+- name: execute {{ scm_prepare_database_sh }}
+  command: {{ scm_prepare_database_sh }} -h{{ mysql_host }} -u{{ mysql_user }} -p{{ mysql_password }} --scm-host {{ cm_host }} mysql cmf cmf Uydc.cmf
   notify:
     - echo uptime
 

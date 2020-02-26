@@ -65,6 +65,10 @@ echo_env_exports() {
     # . spark-submit -> java ...
     # . append -Djava.security.krb5.conf=/path/to/krb5.conf into spark-submit command
     echo export JVM_D_JAVA_SECURITY_KRB5_CONF=\"-Djava.security.krb5.conf=${krb5_conf_file}\"
+
+    echo export CSDE_NAME=\"${to}\"
+
+    echo export CSDE_KEYTAB_FILE=\"/opt/cloudera/keytab/$to/lile.keytab\"
 }
 
 
