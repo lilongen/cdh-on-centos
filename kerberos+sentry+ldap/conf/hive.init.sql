@@ -10,7 +10,7 @@ show databases;
 
 create role r_admin;
 grant all on server server1 to role r_admin;
-grant all on server server1 to role r_admin with grant option;
+# grant all on server server1 to role r_admin with grant option;
 grant role r_admin to group hive;
 create role r_dev;
 create role r_etl;

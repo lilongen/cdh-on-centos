@@ -6,6 +6,19 @@ https://gist.github.com/lilongen/fc3bbaf55ba403820a5632d42920f4cc
 
 ##### CDH cluster deployment
 
+#### CDH LZO install - GPL Extra Parcels
+guide: https://www.cnblogs.com/zhzhang/p/5695027.html
+archive location: https://archive.cloudera.com/gplextras6/
+1. config LZO parcels
+2. install, distribute and activate LZO parcels
+3. hdfs configure changes
+a. 在io.compression.codecs属性值中追加如下值：
+   com.hadoop.compression.lzo.LzoCodec
+   com.hadoop.compression.lzo.LzopCodec
+4. 修改YARN配置
+   将mapreduce.application.classpath的属性值增加一项：/opt/cloudera/parcels/HADOOP_LZO/lib/hadoop/lib/*
+   /opt/cloudera/parcels/GPLEXTRAS/lib/hadoop/lib/hadoop-lzo.jar
+
 ##### add sentry service
 https://blog.51cto.com/14049791/2320241
 
@@ -20,7 +33,7 @@ https://blog.51cto.com/14049791/2320241
 1. 配置Hive使用Sentry服务, sentry service
 2. 关闭Hive的用户模拟功能, HiveServer2 Enable Impersonation
 hive.server2.enable.impersonation, hive.server2.enable.doAs
-
+3. Enable Stored Notifications in Database - Enable stored notifications of metadata changes. When enabled, each metadata change will be stored in NOTIFICATION_LOG
 ###### impala
 1. 配置impala使用Sentry服务, sentry service
 ###### hue
@@ -92,13 +105,13 @@ line 217-219: commented
 ##### kerberos addprinc: hdfs, hive, hbase, impala
 ```bash
 kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle hdfs
-kadmin -p root/admin -w $kadmin_pwd ktadd -k /cdh.kerber.sentry/hdfs.keytab hdfs
+kadmin -p root/admin -w $kadmin_pwd ktadd -k /cdh.kerberos.sentry/hdfs.keytab hdfs
 kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle hive
-kadmin -p root/admin -w $kadmin_pwd ktadd -k /cdh.kerber.sentry/hive.keytab hive
+kadmin -p root/admin -w $kadmin_pwd ktadd -k /cdh.kerberos.sentry/hive.keytab hive
 kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle impala
-kadmin -p root/admin -w $kadmin_pwd ktadd -k /cdh.kerber.sentry/impala.keytab impala
+kadmin -p root/admin -w $kadmin_pwd ktadd -k /cdh.kerberos.sentry/impala.keytab impala
 kadmin -p root/admin -w $kadmin_pwd addprinc -pw lle hbase
-kadmin -p root/admin -w $kadmin_pwd ktadd -k /cdh.kerber.sentry/hbase.keytab hbase
+kadmin -p root/admin -w $kadmin_pwd ktadd -k /cdh.kerberos.sentry/hbase.keytab hbase
 ```
 
 ##### hive beeline create admin role and grant admin role to hive group

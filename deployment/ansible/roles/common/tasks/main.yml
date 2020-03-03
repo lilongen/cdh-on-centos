@@ -5,4 +5,14 @@
   vars:
     packages:
       - psmisc
-      - "{{ svc_cm_agent }}"
+      - "{{ pkg_cm_agent }}"
+  
+
+# - name: parted data partion
+#   command: "{{ item }}"
+#   with_items:
+#     - dd if=/dev/zero of=/dev/sdb bs=512 count=1
+#     - parted /dev/sdb mklabel gpt
+#     - parted -a optimal /dev/sdb mkpart primary 0% 100%
+#     - parted /dev/sdb print
+#     - mkfs.xfs /dev/sdb1
