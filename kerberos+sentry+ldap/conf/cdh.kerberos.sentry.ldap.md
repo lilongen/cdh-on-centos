@@ -38,7 +38,8 @@ hive.server2.enable.impersonation, hive.server2.enable.doAs
 1. 配置impala使用Sentry服务, sentry service
 ###### hue
 1. 配置hue使用Sentry服务, sentry service
-2. configure ldap
+2. configure ldap 
+https://cloud.tencent.com/developer/article/1357110
 
 ##### user/group/role的配置
 https://blog.51cto.com/14049791/2320241
@@ -58,6 +59,21 @@ openssl x509 -req -in ydc-162.csr -out ydc-162.crt -CA lile.ca.crt -CAkey lile.c
 ```
 
 ##### hue ldap
+###### issue: 6.3.2 hue 
+ldap "user_filter" is set, can not authenticate, pop error in /opt/cloudera/parcels/CDH-6.3.2-1.cdh6.3.2.p0.1605554/lib/hue/desktop/core/src/desktop/auth/forms.py forms.py
+so just keep user_filter unset
+
+###### vim /etc/hue/conf/log.conf to set hue error log detail file path and file name 
+to get more detail error info
+```
+[formatter_default]
+class=desktop.log.formatter.Formatter
+#format=[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s
+format=[%(asctime)s] %(pathname)s %(filename)s [line:%(lineno)d] %(module)-12s %(levelname)-8s %(message)s
+datefmt=%d/%b/%Y %H:%M:%S %z
+```
+
+###### bind_dn include 中文出错的workaround
 ```python
 File "/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24/lib/hue/build/env/lib/python2.7/site-packages/django_auth_ldap-1.2.0-py2.7.egg/django_auth_ldap/config.py", line 159, in execute
     filterstr = self.filterstr % filterargs

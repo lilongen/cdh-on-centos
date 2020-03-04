@@ -27,27 +27,22 @@ create database yxt_dirty;
 create database yxt_gz;
 create database yxt_orc;
 create database yxt_parquet;
+create database datapack;
+create database skyeye_bd;
+create database jcrm2;
+create database skyeyev4;
 
 grant all on database yxt to role r_etl;
 grant all on database yxt_dirty to role r_etl;
 grant all on database yxt_gz to role r_etl;
 grant all on database yxt_orc to role r_etl;
 grant all on database yxt_parquet to role r_etl;
+grant all on database datapack to role r_etl;
+grant all on database skyeye_bd to role r_etl;
+grant all on database jcrm2 to role r_etl;
+grant all on database skyeyev4 to role r_etl;
 -- GRANT <Privilege> ON URIs (HDFS and S3A)
 grant all on uri 'hdfs://ydc-162:8020/ws.kylin' to role r_kylin;
-
-use default;
-create table t1 (f1 int);
-create table t2 (f1 int);
-insert into t1 values (1), (2), (3), (4), (5);
-insert into t2 values (1), (2), (3), (4), (5);
-
-create database test_db1;
-use test_db1;
-create table t1(f1 int);
-create table t2 (f1 int);
-insert into t1 values (1), (2), (3), (4), (5);
-insert into t2 values (1), (2), (3), (4), (5);
 
 -- more
 -- https://www.cloudera.com/documentation/enterprise/5-15-x/topics/sg_hive_sql.html
@@ -64,6 +59,10 @@ grant select on database yxt_dirty to role r_dev;
 grant select on database yxt_gz to role r_dev;
 grant select on database yxt_orc to role r_dev;
 grant select on database yxt_parquet to role r_dev;
+grant select on database datapack to role r_dev;
+grant select on database skyeye_bd to role r_dev;
+grant select on database jcrm2 to role r_dev;
+grant select on database skyeyev4 to role r_dev;
 
 -- grant privileges to role r_prod
 grant select on database elearning to role r_prod;
@@ -73,6 +72,25 @@ grant select on database yxt_dirty to role r_prod;
 grant select on database yxt_gz to role r_prod;
 grant select on database yxt_orc to role r_prod;
 grant select on database yxt_parquet to role r_prod;
+grant select on database datapack to role r_prod;
+grant select on database skyeye_bd to role r_prod;
+grant select on database jcrm2 to role r_prod;
+grant select on database skyeyev4 to role r_prod;
+
+
+use default;
+create table t1 (f1 int);
+create table t2 (f1 int);
+insert into t1 values (1), (2), (3), (4), (5);
+insert into t2 values (1), (2), (3), (4), (5);
+
+create database test_db1;
+use test_db1;
+create table t1(f1 int);
+create table t2 (f1 int);
+insert into t1 values (1), (2), (3), (4), (5);
+insert into t2 values (1), (2), (3), (4), (5);
+
 
 -- kylin integration
 ansible ydc -m shell -a 'groupadd g_kylin'

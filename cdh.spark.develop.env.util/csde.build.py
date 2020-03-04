@@ -3,9 +3,9 @@
 #
 
 Env = {
-    'test': {
-        'host': '10.200.70.103',
-        'parcels': ['CDH-6.3.0-1.cdh6.3.0.p0.1279813', 'GPLEXTRAS-6.3.0-1.gplextras6.3.0.p0.1279813']
+    'newdev': {
+        'host': '10.200.70.183',
+        'parcels': ['CDH-6.3.2-1.cdh6.3.2.p0.1605554', 'GPLEXTRAS-6.3.2-1.gplextras6.3.2.p0.1605554']
     },
     'dev': {
         'host': '10.200.70.171',
