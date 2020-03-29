@@ -4,7 +4,7 @@
 
 Env = {
     'newdev': {
-        'host': '10.200.70.183',
+        'host': '10.200.70.190',
         'parcels': ['CDH-6.3.2-1.cdh6.3.2.p0.1605554', 'GPLEXTRAS-6.3.2-1.gplextras6.3.2.p0.1605554']
     },
     'dev': {

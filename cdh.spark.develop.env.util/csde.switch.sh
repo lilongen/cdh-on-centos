@@ -2,6 +2,7 @@
 #
 
 to=$1
+user=$2
 
 spark_dist_classpath_file="/opt/cloudera/spark.dist.classpath/${to}/classpath.txt"
 spark_defaults_file="/opt/cloudera/spark.defaults/${to}/spark-defaults.conf"
@@ -10,9 +11,9 @@ krb5_conf_file="/opt/cloudera/krb5/${to}/krb5.conf"
 
 declare -A cdh_parcels 
 cdh_parcels=( \
-    ["test"]="/opt/cloudera/parcels/CDH-6.3.0-1.cdh6.3.0.p0.1279813" \
+    ["newdev"]="/opt/cloudera/parcels/CDH-6.3.2-1.cdh6.3.2.p0.1605554" \
     ["dev"]="/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24" \
-    ["dev"]="/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24" \
+    ["prod"]="/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24" \
 )
 cdh_parcel=${cdh_parcels[$to]}
 
@@ -68,12 +69,12 @@ echo_env_exports() {
 
     echo export CSDE_NAME=\"${to}\"
 
-    echo export CSDE_KEYTAB_FILE=\"/opt/cloudera/keytab/$to/lile.keytab\"
+    echo export CSDE_KEYTAB_FILE=\"/opt/cloudera/keytab/$to/${user}.keytab\"
 }
 
 
 echo_kinit() {
-    echo kinit -kt /opt/cloudera/keytab/$to/lile.keytab lile
+    echo kinit -kt /opt/cloudera/keytab/$to/${user}.keytab ${user}
 }
 
 
