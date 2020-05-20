@@ -12,7 +12,6 @@ krb5_conf_file="/opt/cloudera/krb5/${to}/krb5.conf"
 declare -A cdh_parcels 
 cdh_parcels=( \
     ["newdev"]="/opt/cloudera/parcels/CDH-6.3.2-1.cdh6.3.2.p0.1605554" \
-    ["dev"]="/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24" \
     ["prod"]="/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24" \
 )
 cdh_parcel=${cdh_parcels[$to]}
